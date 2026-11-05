@@ -1,6 +1,7 @@
-/* App styles */
-.app-container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 20px;
+.app-container h2 {
+  margin-bottom: 10px;
+}
+
+.app-container p {
+  line-height: 1.5;
 }
