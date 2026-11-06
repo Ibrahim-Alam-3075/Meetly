@@ -24,3 +24,15 @@
 .choice a {
   color: steelblue;
 }
+
+.attend {
+  background-color: steelblue;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 8px;
+}
+
+.attend.selected {
+  background-color: seagreen;
+}

@@ -24,6 +24,7 @@ const startingEvents = [
       { place: "Campus cafe", link: "", votes: 0 },
       { place: "", link: "https://meet.google.com", votes: 0 },
     ],
+    finalVenue: { place: "Campus cafe", link: "" },
   },
   {
     id: 2,
@@ -58,6 +59,8 @@ const startingEvents = [
 function App() {
   const [events, setEvents] = useState(startingEvents);
   const [myVotes, setMyVotes] = useState({});
+  const [myAttendance, setMyAttendance] = useState({});
+  const [myPreferences, setMyPreferences] = useState({});
 
   function addEvent(newEvent) {
     setEvents((currentEvents) => [...currentEvents, newEvent]);
@@ -91,6 +94,14 @@ function App() {
     );
   }
 
+  function setAttendance(eventId, choice) {
+    setMyAttendance({ ...myAttendance, [eventId]: choice });
+  }
+
+  function savePreference(eventId, text) {
+    setMyPreferences({ ...myPreferences, [eventId]: text });
+  }
+
   return (
     <BrowserRouter>
       <Layout>
@@ -102,7 +113,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route
             path="/event/:id"
-            element={<EventDetails events={events} myVotes={myVotes} onVote={vote} />}
+            element={<EventDetails events={events} myVotes={myVotes} onVote={vote} myAttendance={myAttendance} onAttend={setAttendance} myPreferences={myPreferences} onSavePreference={savePreference} />}
           />
         </Routes>
       </Layout>
