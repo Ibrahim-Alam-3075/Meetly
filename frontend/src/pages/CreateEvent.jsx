@@ -68,8 +68,8 @@ function CreateEvent({ addEvent }) {
       type,
       description: description.trim(),
       date: filledDates[0].date,
-      dates: filledDates,
-      venues: filledVenues,
+      dates: filledDates.map((item) => ({ ...item, votes: 0 })),
+      venues: filledVenues.map((item) => ({ ...item, votes: 0 })),
     });
 
     navigate("/dashboard");

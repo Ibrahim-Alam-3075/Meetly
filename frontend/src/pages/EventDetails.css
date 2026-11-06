@@ -1,0 +1,26 @@
+.choice {
+  background-color: white;
+  border: 1px solid lightgray;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.choice.leading {
+  background-color: palegreen;
+  border-color: seagreen;
+}
+
+.lead-label {
+  color: darkgreen;
+}
+
+.choice button {
+  background-color: steelblue;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+}
+
+.choice a {
+  color: steelblue;
+}

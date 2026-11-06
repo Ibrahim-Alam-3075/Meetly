@@ -16,8 +16,14 @@ const startingEvents = [
     type: "Hangout",
     date: "2026-11-15",
     description: "Lunch after class.",
-    dates: [{ date: "2026-11-15", time: "13:00" }],
-    venues: [{ place: "Campus cafe", link: "" }],
+    dates: [
+      { date: "2026-11-15", time: "13:00", votes: 0 },
+      { date: "2026-11-16", time: "18:00", votes: 0 },
+    ],
+    venues: [
+      { place: "Campus cafe", link: "", votes: 0 },
+      { place: "", link: "https://meet.google.com", votes: 0 },
+    ],
   },
   {
     id: 2,
@@ -25,8 +31,8 @@ const startingEvents = [
     type: "Meeting",
     date: "2026-11-20",
     description: "Decide the final features for Meetly.",
-    dates: [{ date: "2026-11-20", time: "16:00" }],
-    venues: [{ place: "", link: "https://meet.google.com" }],
+    dates: [{ date: "2026-11-20", time: "16:00", votes: 0 }],
+    venues: [{ place: "", link: "https://meet.google.com", votes: 0 }],
   },
   {
     id: 3,
@@ -34,8 +40,8 @@ const startingEvents = [
     type: "Study session",
     date: "2026-10-28",
     description: "Revise the web programming notes.",
-    dates: [{ date: "2026-10-28", time: "18:00" }],
-    venues: [{ place: "Library", link: "" }],
+    dates: [{ date: "2026-10-28", time: "18:00", votes: 0 }],
+    venues: [{ place: "Library", link: "", votes: 0 }],
   },
   {
     id: 4,
@@ -43,16 +49,45 @@ const startingEvents = [
     type: "Other",
     date: "2026-09-12",
     description: "Dinner after the project demo.",
-    dates: [{ date: "2026-09-12", time: "20:00" }],
-    venues: [{ place: "Food street", link: "" }],
+    dates: [{ date: "2026-09-12", time: "20:00", votes: 0 }],
+    venues: [{ place: "Food street", link: "", votes: 0 }],
   },
 ];
 
 function App() {
   const [events, setEvents] = useState(startingEvents);
+  const [myVotes, setMyVotes] = useState({});
 
   function addEvent(newEvent) {
     setEvents((currentEvents) => [...currentEvents, newEvent]);
+  }
+
+  function vote(eventId, kind, index) {
+    const key = eventId + "-" + kind + "-" + index;
+    const alreadyVoted = myVotes[key];
+
+    setMyVotes({ ...myVotes, [key]: !alreadyVoted });
+
+    setEvents((currentEvents) =>
+      currentEvents.map((event) => {
+        if (event.id !== eventId) {
+          return event;
+        }
+
+        const updatedList = event[kind].map((item, i) => {
+          if (i !== index) {
+            return item;
+          }
+
+          const currentVotes = item.votes || 0;
+          const votes = alreadyVoted ? currentVotes - 1 : currentVotes + 1;
+
+          return { ...item, votes: votes < 0 ? 0 : votes };
+        });
+
+        return { ...event, [kind]: updatedList };
+      })
+    );
   }
 
   return (
@@ -64,7 +99,10 @@ function App() {
           <Route path="/create" element={<CreateEvent addEvent={addEvent} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/event/:id" element={<EventDetails />} />
+          <Route
+            path="/event/:id"
+            element={<EventDetails events={events} myVotes={myVotes} onVote={vote} />}
+          />
         </Routes>
       </Layout>
     </BrowserRouter>
