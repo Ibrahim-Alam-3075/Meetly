@@ -76,6 +76,14 @@ function EventDetails({ events, myVotes, onVote }) {
           </div>
         );
       })}
+
+      {event.agenda && (
+        <div>
+          <h3>Meeting Agenda</h3>
+          <p>{event.agenda}</p>
+        </div>
+      )}
+      
     </div>
   );
 }

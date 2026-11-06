@@ -33,6 +33,7 @@ const startingEvents = [
     description: "Decide the final features for Meetly.",
     dates: [{ date: "2026-11-20", time: "16:00", votes: 0 }],
     venues: [{ place: "", link: "https://meet.google.com", votes: 0 }],
+    agenda: "Discussion",
   },
   {
     id: 3,

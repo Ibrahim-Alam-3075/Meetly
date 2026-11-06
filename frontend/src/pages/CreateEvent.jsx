@@ -11,6 +11,7 @@ function CreateEvent({ addEvent }) {
   const [dates, setDates] = useState([{ date: "", time: "" }]);
   const [venues, setVenues] = useState([{ place: "", link: "" }]);
   const [error, setError] = useState("");
+  const [agenda, setAgenda] = useState("");
 
   function handleDateChange(index, field, value) {
     const updated = [...dates];
@@ -62,6 +63,11 @@ function CreateEvent({ addEvent }) {
       return;
     }
 
+    let agendaText = "";
+    if (type === "Meeting") {
+      agendaText = agenda.trim();
+    }
+
     addEvent({
       id: Date.now(),
       title: title.trim(),
@@ -70,6 +76,7 @@ function CreateEvent({ addEvent }) {
       date: filledDates[0].date,
       dates: filledDates.map((item) => ({ ...item, votes: 0 })),
       venues: filledVenues.map((item) => ({ ...item, votes: 0 })),
+      agenda: agendaText
     });
 
     navigate("/dashboard");
@@ -161,6 +168,13 @@ function CreateEvent({ addEvent }) {
         <button type="button" onClick={addVenue}>
           Add another venue
         </button>
+
+        {type === "Meeting" && <div><h3>Meeting Agenda</h3>
+        <p>Add the agenda for the meeting.</p>
+        <textarea
+          rows="5"
+          value={agenda}
+          onChange={(e) => setAgenda(e.target.value)} /></div>}
 
         {error && <p className="error">{error}</p>}
 
