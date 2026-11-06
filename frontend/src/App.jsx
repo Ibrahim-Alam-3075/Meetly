@@ -1,14 +1,27 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import CreateEvent from "./pages/CreateEvent";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import EventDetails from "./pages/EventDetails";
 import "./App.css";
 
 function App() {
   return (
-    <Layout>
-      <div className="app-container">
-        <h2>Welcome to Meetly</h2>
-        <p>Plan group events, meetings, and study sessions in one place.</p>
-      </div>
-    </Layout>
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create" element={<CreateEvent />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/event/:id" element={<EventDetails />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
   );
 }
 
