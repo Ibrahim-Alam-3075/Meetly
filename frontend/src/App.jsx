@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -56,17 +56,39 @@ const startingEvents = [
   },
 ];
 
+const startingUsers = [{ name: "Test User", email: "test@meetly.com", password: "12345678" }];
+
 function App() {
   const [events, setEvents] = useState(startingEvents);
   const [myVotes, setMyVotes] = useState({});
   const [myAttendance, setMyAttendance] = useState({});
   const [myPreferences, setMyPreferences] = useState({});
+  const [users, setUsers] = useState(startingUsers);
+  const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
 
   function addEvent(newEvent) {
     setEvents((currentEvents) => [...currentEvents, newEvent]);
   }
 
+  function addUser(newUser) {
+    setUsers([...users, newUser]);
+  }
+
+  function login(user) {
+    setCurrentUser(user);
+  }
+
+  function logout() {
+    setCurrentUser(null);
+  }
+
   function vote(eventId, kind, index) {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
     const key = eventId + "-" + kind + "-" + index;
     const alreadyVoted = myVotes[key];
 
@@ -95,29 +117,37 @@ function App() {
   }
 
   function setAttendance(eventId, choice) {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
     setMyAttendance({ ...myAttendance, [eventId]: choice });
   }
 
   function savePreference(eventId, text) {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
     setMyPreferences({ ...myPreferences, [eventId]: text });
   }
 
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard events={events} />} />
-          <Route path="/create" element={<CreateEvent addEvent={addEvent} />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/event/:id"
-            element={<EventDetails events={events} myVotes={myVotes} onVote={vote} myAttendance={myAttendance} onAttend={setAttendance} myPreferences={myPreferences} onSavePreference={savePreference} />}
-          />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <Layout currentUser={currentUser} onLogout={logout}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard events={events} />} />
+        <Route path="/create" element={<CreateEvent addEvent={addEvent} currentUser={currentUser} />} />
+        <Route path="/login" element={<Login users={users} onLogin={login} />} />
+        <Route path="/register" element={<Register users={users} addUser={addUser} />} />
+        <Route
+          path="/event/:id"
+          element={<EventDetails events={events} myVotes={myVotes} onVote={vote} myAttendance={myAttendance} onAttend={setAttendance} myPreferences={myPreferences} onSavePreference={savePreference} />}
+        />
+      </Routes>
+    </Layout>
   );
 }
 

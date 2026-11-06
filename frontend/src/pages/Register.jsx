@@ -1,13 +1,72 @@
-import { Link } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 
-function Register() {
+function Register({ users, addUser }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+
+  const navigate = useNavigate();
+
+  function handleRegister(e) {
+    e.preventDefault();
+
+    if (!name.trim() || !email.trim() || !password) {
+      setMessage('Please fill all fields');
+      return;
+    }
+
+    if (password.length < 8) {
+      setMessage('Password must be at least 8 characters.');
+      return;
+    }
+
+    const existingUser = users.find(
+      (user) => user.email === email.trim().toLowerCase()
+    );
+
+    if (existingUser) {
+      setMessage('An account with this email already exists.');
+      return;
+    }
+
+    const newUser = {
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      password: password
+    };
+
+    addUser(newUser);
+
+    navigate('/login');
+  }
+
   return (
     <div className="app-container">
-      <h2>Register</h2>
-      <p>Create a new account.</p>
-      <p>
-        Already have an account? <Link to="/login">Login</Link>
-      </p>
+      <h2>Create Account</h2>
+
+      <form onSubmit={handleRegister}>
+        <div>
+          <label>Name: </label>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
+
+        <div>
+          <label>Email: </label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+
+        <div>
+          <label>Password: </label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+
+        <button type="submit">Register</button>
+      </form>
+
+      <p>{message}</p>
+      <p>Already have an account? <Link to="/login">Login</Link></p>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import "./Navbar.css";
 
-function Navbar() {
+function Navbar({ currentUser, onLogout }) {
   return (
     <header className="navbar">
       <h1 className="logo">
@@ -11,7 +11,10 @@ function Navbar() {
         <Link to="/">Home</Link>
         <Link to="/dashboard">Dashboard</Link>
         <Link to="/create">Create Event</Link>
-        <Link to="/login">Login</Link>
+        {!currentUser && <Link to="/login">Login</Link>}
+        {!currentUser && <Link to="/register">Register</Link>}
+        {currentUser && <p>Welcome, {currentUser.name}</p>}
+        {currentUser && <button onClick={onLogout}>Logout</button>}
       </nav>
     </header>
   );

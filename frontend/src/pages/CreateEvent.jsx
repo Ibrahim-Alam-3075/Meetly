@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CreateEvent.css";
 
-function CreateEvent({ addEvent }) {
+function CreateEvent({ addEvent, currentUser }) {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
@@ -43,6 +43,11 @@ function CreateEvent({ addEvent }) {
 
   function handleSubmit(event) {
     event.preventDefault();
+
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
 
     if (title.trim() === "") {
       setError("Please enter a title.");
