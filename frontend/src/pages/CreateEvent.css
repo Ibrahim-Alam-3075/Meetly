@@ -1,0 +1,47 @@
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.create-form input,
+.create-form select,
+.create-form textarea {
+  width: 100%;
+  max-width: 420px;
+  padding: 6px;
+  border: 1px solid gray;
+}
+
+.create-form h3 {
+  margin-top: 18px;
+  margin-bottom: 8px;
+}
+
+.option-row {
+  margin-bottom: 8px;
+}
+
+.option-row input {
+  margin-bottom: 6px;
+}
+
+.create-form button {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  padding: 6px 12px;
+}
+
+.submit-button {
+  background-color: steelblue;
+  color: white;
+  border: none;
+  margin-top: 8px;
+}
+
+.error {
+  color: red;
+}

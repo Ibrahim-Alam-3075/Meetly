@@ -1,38 +1,7 @@
 import EventCard from "../components/EventCard";
 import "./Dashboard.css";
 
-function Dashboard() {
-  const events = [
-    {
-      id: 1,
-      title: "Sunday Hangout",
-      type: "Hangout",
-      date: "2026-11-15",
-      description: "Lunch after class.",
-    },
-    {
-      id: 2,
-      title: "Project Meeting",
-      type: "Meeting",
-      date: "2026-11-20",
-      description: "Decide the final features for Meetly.",
-    },
-    {
-      id: 3,
-      title: "Midterm Study Session",
-      type: "Study session",
-      date: "2026-10-28",
-      description: "Revise the web programming notes.",
-    },
-    {
-      id: 4,
-      title: "Group Dinner",
-      type: "Other",
-      date: "2026-09-12",
-      description: "Dinner after the project demo.",
-    },
-  ];
-
+function Dashboard({ events }) {
   const today = new Date().toISOString().slice(0, 10);
   const upcoming = events.filter((event) => event.date >= today);
   const past = events.filter((event) => event.date < today);

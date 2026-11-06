@@ -12,7 +12,12 @@ function EventCard({ event }) {
       </p>
       <h3>{event.title}</h3>
       <p>{event.type}</p>
-      <p>{event.date}</p>
+      <p>
+        {event.date}
+        {event.dates && event.dates[0] && event.dates[0].time
+          ? " at " + event.dates[0].time
+          : ""}
+      </p>
       <p>{event.description}</p>
       <Link to={"/event/" + event.id}>View event</Link>
     </div>
