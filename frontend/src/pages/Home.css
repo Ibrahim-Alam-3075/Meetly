@@ -1,0 +1,18 @@
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px;
+}
+
+.step {
+  flex: 1 1 200px;
+  background-color: white;
+  border: 1px solid lightgray;
+  padding: 10px;
+}
+
+.step h3 {
+  color: steelblue;
+  margin-bottom: 5px;
+}
