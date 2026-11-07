@@ -14,7 +14,7 @@ function Navbar() {
       </h1>
       <nav>
         <Link to="/">Home</Link>
-        <Link to="/dashboard">Dashboard</Link>
+        {currentUser && <Link to="/dashboard">Dashboard</Link>}
         <Link to="/create">Create Event</Link>
         {!currentUser && <Link to="/login">Login</Link>}
         {!currentUser && <Link to="/register">Register</Link>}

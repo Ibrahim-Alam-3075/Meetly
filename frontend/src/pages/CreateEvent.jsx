@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addEvent } from "../eventSlice";
+import {Link} from "react-router-dom";
 import "./CreateEvent.css";
 
 function CreateEvent() {
@@ -92,6 +93,10 @@ function CreateEvent() {
 
     navigate("/dashboard");
   }
+
+  if (!currentUser) {
+  return <div className="app-container"><p>Please log in to create events.</p><Link to="/login">Login</Link></div>;
+}
 
   return (
     <div className="app-container">
