@@ -1,7 +1,12 @@
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { logout } from "../authSlice";
 import "./Navbar.css";
 
-function Navbar({ currentUser, onLogout }) {
+function Navbar() {
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const dispatch = useDispatch();
+
   return (
     <header className="navbar">
       <h1 className="logo">
@@ -14,7 +19,7 @@ function Navbar({ currentUser, onLogout }) {
         {!currentUser && <Link to="/login">Login</Link>}
         {!currentUser && <Link to="/register">Register</Link>}
         {currentUser && <p>Welcome, {currentUser.name}</p>}
-        {currentUser && <button onClick={onLogout}>Logout</button>}
+        {currentUser && <button onClick={() => dispatch(logout())}>Logout</button>}
       </nav>
     </header>
   );

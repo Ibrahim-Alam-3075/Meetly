@@ -1,7 +1,9 @@
+import { useSelector } from "react-redux";
 import EventCard from "../components/EventCard";
 import "./Dashboard.css";
 
-function Dashboard({ events }) {
+function Dashboard() {
+  const events = useSelector((state) => state.event.events);
   const today = new Date().toISOString().slice(0, 10);
   const upcoming = events.filter((event) => event.date >= today);
   const past = events.filter((event) => event.date < today);

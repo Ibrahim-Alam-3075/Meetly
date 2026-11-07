@@ -1,6 +1,11 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-function Login({ users, onLogin }) {
+import { login } from "../authSlice";
+
+function Login() {
+    const users = useSelector((state) => state.auth.users);
+    const dispatch = useDispatch();
 
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('');
@@ -15,7 +20,7 @@ e.preventDefault();
 const user = users.find(user => user.email.trim().toLowerCase() === email.trim().toLowerCase() && user.password === password);
 
 if(user){
-    onLogin({name: user.name, email: user.email});
+    dispatch(login({name: user.name, email: user.email}));
     navigate("/dashboard");
 
 }else{

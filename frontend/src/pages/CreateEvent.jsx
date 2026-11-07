@@ -1,9 +1,13 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { addEvent } from "../eventSlice";
 import "./CreateEvent.css";
 
-function CreateEvent({ addEvent, currentUser }) {
+function CreateEvent() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const currentUser = useSelector((state) => state.auth.currentUser);
 
   const [title, setTitle] = useState("");
   const [type, setType] = useState("Hangout");
@@ -73,7 +77,7 @@ function CreateEvent({ addEvent, currentUser }) {
       agendaText = agenda.trim();
     }
 
-    addEvent({
+    dispatch(addEvent({
       id: Date.now(),
       title: title.trim(),
       type,
@@ -81,8 +85,8 @@ function CreateEvent({ addEvent, currentUser }) {
       date: filledDates[0].date,
       dates: filledDates.map((item) => ({ ...item, votes: 0 })),
       venues: filledVenues.map((item) => ({ ...item, votes: 0 })),
-      agenda: agendaText
-    });
+      agenda: agendaText,
+    }));
 
     navigate("/dashboard");
   }

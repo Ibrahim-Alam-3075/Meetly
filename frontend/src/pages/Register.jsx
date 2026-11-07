@@ -1,7 +1,11 @@
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
+import { addUser } from '../authSlice';
 
-function Register({ users, addUser }) {
+function Register() {
+  const users = useSelector((state) => state.auth.users);
+  const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,7 +41,7 @@ function Register({ users, addUser }) {
       password: password
     };
 
-    addUser(newUser);
+    dispatch(addUser(newUser));
 
     navigate('/login');
   }

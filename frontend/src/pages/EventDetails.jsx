@@ -1,11 +1,50 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { savePreference, setAttendance, vote } from "../eventSlice";
 import "./EventDetails.css";
 
-function EventDetails({ events, myVotes, onVote, myAttendance, onAttend, myPreferences, onSavePreference }) {
+function EventDetails() {
   const { id } = useParams();
-  const event = events.find((item) => String(item.id) === id);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const events = useSelector((state) => state.event.events);
+  const myVotes = useSelector((state) => state.event.myVotes);
+  const myAttendance = useSelector((state) => state.event.myAttendance);
+  const myPreferences = useSelector((state) => state.event.myPreferences);
+  const currentUser = useSelector((state) => state.auth.currentUser);
   const [preference, setPreference] = useState("");
+
+  const event = events.find((item) => String(item.id) === id);
+
+  function handleVote(eventId, kind, index) {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    dispatch(vote({ eventId, kind, index }));
+  }
+
+  function handleAttend(eventId, choice) {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    dispatch(setAttendance({ eventId, choice }));
+  }
+
+  function handleSave(e) {
+    e.preventDefault();
+
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    dispatch(savePreference({ eventId: event.id, text: preference.trim() }));
+  }
 
   if (!event) {
     return (
@@ -16,11 +55,6 @@ function EventDetails({ events, myVotes, onVote, myAttendance, onAttend, myPrefe
         </p>
       </div>
     );
-  }
-
-  function handleSave(e) {
-    e.preventDefault();
-    onSavePreference(event.id, preference.trim());
   }
 
   const dateVotes = event.dates.map((item) => item.votes || 0);
@@ -65,7 +99,7 @@ function EventDetails({ events, myVotes, onVote, myAttendance, onAttend, myPrefe
             </p>
             <p>{votes === 1 ? "1 vote" : votes + " votes"}</p>
             {leading && <p className="lead-label">Leading</p>}
-            <button type="button" onClick={() => onVote(event.id, "dates", index)}>
+            <button type="button" onClick={() => handleVote(event.id, "dates", index)}>
               {voted ? "Remove vote" : "Vote"}
             </button>
           </div>
@@ -91,7 +125,7 @@ function EventDetails({ events, myVotes, onVote, myAttendance, onAttend, myPrefe
             </p>
             <p>{votes === 1 ? "1 vote" : votes + " votes"}</p>
             {leading && <p className="lead-label">Leading</p>}
-            <button type="button" onClick={() => onVote(event.id, "venues", index)}>
+            <button type="button" onClick={() => handleVote(event.id, "venues", index)}>
               {voted ? "Remove vote" : "Vote"}
             </button>
           </div>
@@ -103,19 +137,19 @@ function EventDetails({ events, myVotes, onVote, myAttendance, onAttend, myPrefe
           <h3>Will you attend?</h3>
           <button
             className={myAttendance[event.id] === "attending" ? "attend selected" : "attend"}
-            onClick={() => onAttend(event.id, "attending")}
+            onClick={() => handleAttend(event.id, "attending")}
           >
             Attending
           </button>
           <button
             className={myAttendance[event.id] === "maybe" ? "attend selected" : "attend"}
-            onClick={() => onAttend(event.id, "maybe")}
+            onClick={() => handleAttend(event.id, "maybe")}
           >
             Maybe
           </button>
           <button
             className={myAttendance[event.id] === "not attending" ? "attend selected" : "attend"}
-            onClick={() => onAttend(event.id, "not attending")}
+            onClick={() => handleAttend(event.id, "not attending")}
           >
             Not attending
           </button>

@@ -1,10 +1,10 @@
 import Navbar from "./Navbar";
 import "./Layout.css";
 
-function Layout({ children, currentUser, onLogout }) {
+function Layout({ children }) {
   return (
     <div className="layout">
-      <Navbar currentUser={currentUser} onLogout={onLogout} />
+      <Navbar />
       <main className="page">{children}</main>
     </div>
   );
