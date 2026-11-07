@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../authSlice";
+import "./Auth.css";
+
 
 function Login() {
     const users = useSelector((state) => state.auth.users);
@@ -29,7 +31,7 @@ if(user){
     }
 
   return (
-    <div className="app-container">
+    <div className="auth-card">
       <h2>Login Page</h2>
       <form onSubmit={handleLogin}>
         <div> <label>Email:</label>
@@ -41,7 +43,7 @@ if(user){
         value={password}
         onChange={(e) => setPassword(e.target.value)} /> </div>
 
-<button type="submit">Login</button>
+<button className = "auth-button" type="submit">Login</button>
       </form>
       <p>{message}</p>
       <p>No account yet? <Link to="/register">Register</Link></p>

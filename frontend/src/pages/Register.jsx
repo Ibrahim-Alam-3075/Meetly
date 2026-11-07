@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { addUser } from '../authSlice';
+import "./Auth.css";
+
 
 function Register() {
   const users = useSelector((state) => state.auth.users);
@@ -47,7 +49,7 @@ function Register() {
   }
 
   return (
-    <div className="app-container">
+    <div className="auth-card">
       <h2>Create Account</h2>
 
       <form onSubmit={handleRegister}>
@@ -66,7 +68,7 @@ function Register() {
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
 
-        <button type="submit">Register</button>
+        <button className = "auth-button" type="submit">Register</button>
       </form>
 
       <p>{message}</p>
