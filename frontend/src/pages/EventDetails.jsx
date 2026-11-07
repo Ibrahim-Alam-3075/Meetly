@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { savePreference, setAttendance, vote } from "../eventSlice";
+import { finalizeEvent, savePreference, setAttendance, vote } from "../eventSlice";
 import "./EventDetails.css";
+
+function mapLink(place) {
+  return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(place);
+}
 
 function EventDetails() {
   const { id } = useParams();
@@ -10,10 +14,13 @@ function EventDetails() {
   const dispatch = useDispatch();
   const events = useSelector((state) => state.event.events);
   const myVotes = useSelector((state) => state.event.myVotes);
-  const myAttendance = useSelector((state) => state.event.myAttendance);
-  const myPreferences = useSelector((state) => state.event.myPreferences);
+  const attendance = useSelector((state) => state.event.attendance);
+  const preferences = useSelector((state) => state.event.preferences);
   const currentUser = useSelector((state) => state.auth.currentUser);
   const [preference, setPreference] = useState("");
+  const [dateIndex, setDateIndex] = useState(0);
+  const [venueIndex, setVenueIndex] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const event = events.find((item) => String(item.id) === id);
 
@@ -23,7 +30,7 @@ function EventDetails() {
       return;
     }
 
-    dispatch(vote({ eventId, kind, index }));
+    dispatch(vote({ eventId, kind, index, email: currentUser.email }));
   }
 
   function handleAttend(eventId, choice) {
@@ -32,7 +39,12 @@ function EventDetails() {
       return;
     }
 
-    dispatch(setAttendance({ eventId, choice }));
+    dispatch(setAttendance({
+      eventId,
+      email: currentUser.email,
+      name: currentUser.name,
+      choice,
+    }));
   }
 
   function handleSave(e) {
@@ -43,7 +55,27 @@ function EventDetails() {
       return;
     }
 
-    dispatch(savePreference({ eventId: event.id, text: preference.trim() }));
+    dispatch(savePreference({
+      eventId: event.id,
+      email: currentUser.email,
+      name: currentUser.name,
+      text: preference.trim(),
+    }));
+  }
+
+  function handleFinalize() {
+    dispatch(finalizeEvent({
+      eventId: event.id,
+      dateIndex: Number(dateIndex),
+      venueIndex: Number(venueIndex),
+    }));
+  }
+
+  function copyLink() {
+    const link = window.location.origin + "/event/" + event.id;
+    navigator.clipboard.writeText(link).then(() => {
+      setCopied(true);
+    });
   }
 
   if (!event) {
@@ -57,6 +89,17 @@ function EventDetails() {
     );
   }
 
+  const isOrganizer = currentUser && currentUser.email === event.organizerEmail;
+  const responses = attendance[event.id] || [];
+  const preferenceList = preferences[event.id] || [];
+  const myResponse = currentUser
+    ? responses.find((item) => item.email === currentUser.email)
+    : null;
+  const myChoice = myResponse ? myResponse.choice : "";
+  const mySavedPreference = currentUser
+    ? preferenceList.find((item) => item.email === currentUser.email)
+    : null;
+
   const dateVotes = event.dates.map((item) => item.votes || 0);
   const venueVotes = event.venues.map((item) => item.votes || 0);
   const topDateVotes = dateVotes.length ? Math.max(...dateVotes) : 0;
@@ -64,15 +107,17 @@ function EventDetails() {
 
   let hasVoted = false;
 
-  for (let i = 0; i < event.dates.length; i++) {
-    if (myVotes[event.id + "-dates-" + i]) {
-      hasVoted = true;
+  if (currentUser) {
+    for (let i = 0; i < event.dates.length; i++) {
+      if (myVotes[currentUser.email + "-" + event.id + "-dates-" + i]) {
+        hasVoted = true;
+      }
     }
-  }
 
-  for (let i = 0; i < event.venues.length; i++) {
-    if (myVotes[event.id + "-venues-" + i]) {
-      hasVoted = true;
+    for (let i = 0; i < event.venues.length; i++) {
+      if (myVotes[currentUser.email + "-" + event.id + "-venues-" + i]) {
+        hasVoted = true;
+      }
     }
   }
 
@@ -85,11 +130,16 @@ function EventDetails() {
       <p>{event.type}</p>
       {event.description && <p>{event.description}</p>}
 
+      <p>Share this link: {window.location.origin + "/event/" + event.id}</p>
+      <button type="button" onClick={copyLink}>Copy link</button>
+      {copied && <p className="lead-label">Link copied</p>}
+
       <h3>Date options</h3>
+      {event.votingClosed && <p>Voting is closed.</p>}
       {event.dates.map((item, index) => {
         const votes = item.votes || 0;
         const leading = votes > 0 && votes === topDateVotes;
-        const voted = myVotes[event.id + "-dates-" + index];
+        const voted = currentUser && myVotes[currentUser.email + "-" + event.id + "-dates-" + index];
 
         return (
           <div className={leading ? "choice leading" : "choice"} key={index}>
@@ -99,9 +149,11 @@ function EventDetails() {
             </p>
             <p>{votes === 1 ? "1 vote" : votes + " votes"}</p>
             {leading && <p className="lead-label">Leading</p>}
-            <button type="button" onClick={() => handleVote(event.id, "dates", index)}>
-              {voted ? "Remove vote" : "Vote"}
-            </button>
+            {!event.votingClosed && (
+              <button type="button" onClick={() => handleVote(event.id, "dates", index)}>
+                {voted ? "Remove vote" : "Vote"}
+              </button>
+            )}
           </div>
         );
       })}
@@ -110,7 +162,7 @@ function EventDetails() {
       {event.venues.map((item, index) => {
         const votes = item.votes || 0;
         const leading = votes > 0 && votes === topVenueVotes;
-        const voted = myVotes[event.id + "-venues-" + index];
+        const voted = currentUser && myVotes[currentUser.email + "-" + event.id + "-venues-" + index];
 
         return (
           <div className={leading ? "choice leading" : "choice"} key={index}>
@@ -123,32 +175,76 @@ function EventDetails() {
                 </a>
               )}
             </p>
+            {item.place && (
+              <p>
+                <a href={mapLink(item.place)} target="_blank" rel="noreferrer">
+                  View on map
+                </a>
+              </p>
+            )}
             <p>{votes === 1 ? "1 vote" : votes + " votes"}</p>
             {leading && <p className="lead-label">Leading</p>}
-            <button type="button" onClick={() => handleVote(event.id, "venues", index)}>
-              {voted ? "Remove vote" : "Vote"}
-            </button>
+            {!event.votingClosed && (
+              <button type="button" onClick={() => handleVote(event.id, "venues", index)}>
+                {voted ? "Remove vote" : "Vote"}
+              </button>
+            )}
           </div>
         );
       })}
 
-      {hasVoted && (
+      {isOrganizer && !event.votingClosed && (
+        <div className="final-box">
+          <h3>Confirm the final plan</h3>
+          <div className="form-group">
+            <label htmlFor="final-date">Final date</label>
+            <select
+              id="final-date"
+              value={dateIndex}
+              onChange={(e) => setDateIndex(e.target.value)}
+            >
+              {event.dates.map((item, index) => (
+                <option value={index} key={index}>
+                  {item.date}{item.time ? " at " + item.time : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group">
+            <label htmlFor="final-venue">Final venue</label>
+            <select
+              id="final-venue"
+              value={venueIndex}
+              onChange={(e) => setVenueIndex(e.target.value)}
+            >
+              {event.venues.map((item, index) => (
+                <option value={index} key={index}>
+                  {item.place || item.link}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button type="button" onClick={handleFinalize}>Close voting</button>
+        </div>
+      )}
+
+      {(hasVoted || event.votingClosed) && (
         <div>
           <h3>Will you attend?</h3>
           <button
-            className={myAttendance[event.id] === "attending" ? "attend selected" : "attend"}
+            className={myChoice === "attending" ? "attend selected" : "attend"}
             onClick={() => handleAttend(event.id, "attending")}
           >
             Attending
           </button>
           <button
-            className={myAttendance[event.id] === "maybe" ? "attend selected" : "attend"}
+            className={myChoice === "maybe" ? "attend selected" : "attend"}
             onClick={() => handleAttend(event.id, "maybe")}
           >
             Maybe
           </button>
           <button
-            className={myAttendance[event.id] === "not attending" ? "attend selected" : "attend"}
+            className={myChoice === "not attending" ? "attend selected" : "attend"}
             onClick={() => handleAttend(event.id, "not attending")}
           >
             Not attending
@@ -158,18 +254,51 @@ function EventDetails() {
 
       {event.finalVenue && (
         <div>
-          <h3>Final venue</h3>
+          <h3>Final plan</h3>
+          <p>
+            {event.finalDate}
+            {event.finalTime ? " at " + event.finalTime : ""}
+          </p>
           <p>{event.finalVenue.place} {event.finalVenue.link}</p>
+          {event.finalVenue.place && (
+            <div>
+              <p>
+                <a href={mapLink(event.finalVenue.place)} target="_blank" rel="noreferrer">
+                  View final venue on map
+                </a>
+              </p>
+              <iframe
+                className="map-frame"
+                title="Venue map"
+                src={"https://maps.google.com/maps?q=" + encodeURIComponent(event.finalVenue.place) + "&output=embed"}
+              />
+            </div>
+          )}
           <form onSubmit={handleSave}>
             <label>Your preferences: </label>
             <input placeholder="e.g quiet place, 6 person seating" value={preference} onChange={(e) => setPreference(e.target.value)} />
             <button type="submit">Save</button>
           </form>
 
-          <h3>Summary</h3>
+          <h3>Your summary</h3>
           <p>Venue: {event.finalVenue.place} {event.finalVenue.link}</p>
-          <p>Attendance: {myAttendance[event.id] || "Not chosen"}</p>
-          <p>Preferences: {myPreferences[event.id] || "Not chosen"}</p>
+          <p>Attendance: {myChoice || "Not chosen"}</p>
+          <p>Preferences: {mySavedPreference ? mySavedPreference.text : "Not chosen"}</p>
+        </div>
+      )}
+
+      {isOrganizer && (
+        <div>
+          <h3>Participant list</h3>
+          {responses.length === 0 && <p>No responses yet.</p>}
+          {responses.map((item) => (
+            <p key={item.email}>{item.name}: {item.choice}</p>
+          ))}
+          <h3>Preference summary</h3>
+          {preferenceList.length === 0 && <p>No preferences yet.</p>}
+          {preferenceList.map((item) => (
+            <p key={item.email}>{item.name}: {item.text}</p>
+          ))}
         </div>
       )}
 
@@ -179,7 +308,6 @@ function EventDetails() {
           <p>{event.agenda}</p>
         </div>
       )}
-      
     </div>
   );
 }

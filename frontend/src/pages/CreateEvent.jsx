@@ -86,6 +86,8 @@ function CreateEvent() {
       dates: filledDates.map((item) => ({ ...item, votes: 0 })),
       venues: filledVenues.map((item) => ({ ...item, votes: 0 })),
       agenda: agendaText,
+      organizerEmail: currentUser.email,
+      votingClosed: false,
     }));
 
     navigate("/dashboard");

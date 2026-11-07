@@ -36,3 +36,24 @@
 .attend.selected {
   background-color: seagreen;
 }
+
+.final-box {
+  background-color: white;
+  border: 1px solid lightgray;
+  padding: 12px;
+  margin: 16px 0;
+}
+
+.final-box select,
+.final-box button {
+  padding: 6px;
+  margin: 6px 8px 6px 0;
+}
+
+.map-frame {
+  width: 100%;
+  max-width: 480px;
+  height: 220px;
+  border: 1px solid lightgray;
+  margin-top: 8px;
+}
