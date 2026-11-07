@@ -1,4 +1,8 @@
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Routes, Route } from "react-router-dom";
+import sampleEvents from "./data/sampleEvents";
+import { setEvents } from "./eventSlice";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -9,6 +13,14 @@ import EventDetails from "./pages/EventDetails";
 import "./App.css";
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setTimeout(() => {
+      dispatch(setEvents(sampleEvents));
+    }, 1000);
+  }, [dispatch]);
+
   return (
     <Layout>
       <Routes>

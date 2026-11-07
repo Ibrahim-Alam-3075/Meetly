@@ -13,6 +13,7 @@ function EventDetails() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const events = useSelector((state) => state.event.events);
+  const loading = useSelector((state) => state.event.loading);
   const myVotes = useSelector((state) => state.event.myVotes);
   const attendance = useSelector((state) => state.event.attendance);
   const preferences = useSelector((state) => state.event.preferences);
@@ -76,6 +77,10 @@ function EventDetails() {
     navigator.clipboard.writeText(link).then(() => {
       setCopied(true);
     });
+  }
+
+  if (loading) {
+    return <div className="app-container"><p>Loading event details...</p></div>;
   }
 
   if (!event) {

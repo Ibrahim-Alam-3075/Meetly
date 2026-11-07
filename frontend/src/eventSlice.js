@@ -3,59 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const eventSlice = createSlice({
   name: "event",
   initialState: {
-    events: [
-      {
-        id: 1,
-        title: "Sunday Hangout",
-        type: "Hangout",
-        date: "2026-11-15",
-        description: "Lunch after class.",
-        dates: [
-          { date: "2026-11-15", time: "13:00", votes: 0 },
-          { date: "2026-11-16", time: "18:00", votes: 0 },
-        ],
-        venues: [
-          { place: "Campus cafe", link: "", votes: 0 },
-          { place: "", link: "https://meet.google.com", votes: 0 },
-        ],
-        organizerEmail: "test@meetly.com",
-        votingClosed: false,
-      },
-      {
-        id: 2,
-        title: "Project Meeting",
-        type: "Meeting",
-        date: "2026-11-20",
-        description: "Decide the final features for Meetly.",
-        dates: [{ date: "2026-11-20", time: "16:00", votes: 0 }],
-        venues: [{ place: "", link: "https://meet.google.com", votes: 0 }],
-        agenda: "Discussion",
-        organizerEmail: "test@meetly.com",
-        votingClosed: false,
-      },
-      {
-        id: 3,
-        title: "Midterm Study Session",
-        type: "Study session",
-        date: "2026-10-28",
-        description: "Revise the web programming notes.",
-        dates: [{ date: "2026-10-28", time: "18:00", votes: 0 }],
-        venues: [{ place: "Library", link: "", votes: 0 }],
-        organizerEmail: "test@meetly.com",
-        votingClosed: false,
-      },
-      {
-        id: 4,
-        title: "Group Dinner",
-        type: "Other",
-        date: "2026-09-12",
-        description: "Dinner after the project demo.",
-        dates: [{ date: "2026-09-12", time: "20:00", votes: 0 }],
-        venues: [{ place: "Food street", link: "", votes: 0 }],
-        organizerEmail: "test@meetly.com",
-        votingClosed: false,
-      },
-    ],
+    events: [],
+    loading: true,
     myVotes: {},
     attendance: {},
     preferences: {},
@@ -63,6 +12,10 @@ const eventSlice = createSlice({
   reducers: {
     addEvent(state, action) {
       state.events.push(action.payload);
+    },
+    setEvents(state, action) {
+      state.events = action.payload;
+      state.loading = false;
     },
     vote(state, action) {
       const { eventId, kind, index, email } = action.payload;
@@ -126,5 +79,5 @@ const eventSlice = createSlice({
   },
 });
 
-export const { addEvent, vote, setAttendance, savePreference, finalizeEvent } = eventSlice.actions;
+export const { addEvent, setEvents, vote, setAttendance, savePreference, finalizeEvent } = eventSlice.actions;
 export default eventSlice.reducer;

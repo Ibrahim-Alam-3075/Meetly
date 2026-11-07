@@ -4,9 +4,14 @@ import "./Dashboard.css";
 
 function Dashboard() {
   const events = useSelector((state) => state.event.events);
+  const loading = useSelector((state) => state.event.loading);
   const today = new Date().toISOString().slice(0, 10);
   const upcoming = events.filter((event) => event.date >= today);
   const past = events.filter((event) => event.date < today);
+
+  if (loading) {
+    return <div className="app-container"><p>Loading events...</p></div>;
+  }
 
   return (
     <div className="app-container">
