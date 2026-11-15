@@ -8,6 +8,7 @@ const generateToken = (id) => {
     expiresIn: '30d'
   })
 }
+
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body
@@ -73,7 +74,23 @@ const loginUser = async (req, res) => {
   }
 }
 
+
+
+
+const getMe = async (req, res) => {
+  try {
+    return res.status(200).json({
+      _id: req.user._id,
+      name: req.user.name,
+      email: req.user.email
+    })
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
+}
+
 module.exports = {
   registerUser,
-  loginUser
+  loginUser,
+  getMe
 }
