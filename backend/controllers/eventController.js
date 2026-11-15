@@ -46,3 +46,33 @@ exports.createEvent = async (req, res) => {
         res.status(500).send(err.message);
     }
 };
+
+exports.voteEvent = async (req, res) => {
+    try {
+        const { kind, index } = req.body;
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        if (event.votingClosed) {
+            return res.status(400).json({ message: 'Voting is closed' });
+        }
+
+        const option = event[kind][index];
+        const userId = req.user._id.toString();
+        const alreadyVoted = option.votes.some((id) => id.toString() === userId);
+
+        if (alreadyVoted) {
+            option.votes = option.votes.filter((id) => id.toString() !== userId);
+        } else {
+            option.votes.push(req.user._id);
+        }
+
+        await event.save();
+        res.json(event);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+};
