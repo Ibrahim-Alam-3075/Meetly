@@ -20,3 +20,29 @@ exports.getEventById = async (req, res) => {
         res.status(500).send(err.message);
     }
 };
+
+exports.createEvent = async (req, res) => {
+    try {
+        const { title, type, description, dates, venues, agenda } = req.body;
+
+        if (!title) {
+            return res.status(400).json({ message: 'Please enter a title' });}
+
+        if (!dates || dates.length === 0) {
+            return res.status(400).json({ message: 'Please add at least one date' });}
+
+        const event = new Event({
+            title, type, description,
+            date: dates[0].date,
+            dates: dates.map((item) => ({ date: item.date, time: item.time })),
+            venues: (venues || []).map((item) => ({ place: item.place, link: item.link })),
+            agenda: type === 'Meeting' ? agenda : '',
+            organizer: req.user._id
+        });
+
+        await event.save();
+        res.status(201).json(event);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+};
