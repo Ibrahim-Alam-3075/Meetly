@@ -109,3 +109,27 @@ exports.finalizeEvent = async (req, res) => {
         res.status(500).send(err.message);
     }
 };
+
+exports.setAttendance = async (req, res) => {
+    try {
+        const { choice } = req.body;
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });}
+
+        const userId = req.user._id.toString();
+        const existing = event.attendance.find((item) => item.user.toString() === userId);
+
+        if (existing) {
+            existing.choice = choice;
+        } else {
+            event.attendance.push({ user: req.user._id, name: req.user.name, email: req.user.email, choice });
+        }
+
+        await event.save();
+        res.json(event);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+};
