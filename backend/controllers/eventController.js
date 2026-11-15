@@ -76,3 +76,36 @@ exports.voteEvent = async (req, res) => {
         res.status(500).send(err.message);
     }
 };
+
+exports.finalizeEvent = async (req, res) => {
+    try {
+        const { dateIndex, venueIndex } = req.body;
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        if (event.organizer.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Only the organizer can finalize this event' });
+        }
+
+        const dateChoice = event.dates[dateIndex];
+        const venueChoice = event.venues[venueIndex];
+
+        if (!dateChoice || !venueChoice) {
+            return res.status(400).json({ message: 'Please choose a date and a venue' });
+        }
+
+        event.votingClosed = true;
+        event.date = dateChoice.date;
+        event.finalDate = dateChoice.date;
+        event.finalTime = dateChoice.time;
+        event.finalVenue = { place: venueChoice.place, link: venueChoice.link };
+
+        await event.save();
+        res.json(event);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+};
