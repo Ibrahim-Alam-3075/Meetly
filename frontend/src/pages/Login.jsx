@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../authSlice";
 import "./Auth.css";
 
-
 function Login() {
-    const users = useSelector((state) => state.auth.users);
     const dispatch = useDispatch();
 
     const [email,setEmail] = useState('');
@@ -16,18 +14,27 @@ function Login() {
     const navigate = useNavigate();
 
 
-    function handleLogin(e){
+       function handleLogin(e){
 e.preventDefault();
 
-const user = users.find(user => user.email.trim().toLowerCase() === email.trim().toLowerCase() && user.password === password);
-
-if(user){
-    dispatch(login({name: user.name, email: user.email}));
-    navigate("/dashboard");
-
-}else{
-    setMessage('Invalid email or password');
-}
+fetch('http://localhost:5000/api/users/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email.trim().toLowerCase(), password })
+})
+    .then(response => response.json())
+    .then(data => {
+        if (data.token) {
+            localStorage.setItem('token', data.token);
+            dispatch(login({ _id: data._id, name: data.name, email: data.email }));
+            navigate("/dashboard");
+        } else {
+            setMessage(data.message);
+        }
+    })
+    .catch(() => {
+        setMessage('Could not reach the server');
+    });
     }
 
   return (

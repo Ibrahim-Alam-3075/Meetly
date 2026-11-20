@@ -1,13 +1,8 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { addUser } from '../authSlice';
 import "./Auth.css";
 
-
 function Register() {
-  const users = useSelector((state) => state.auth.users);
-  const dispatch = useDispatch();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,24 +23,22 @@ function Register() {
       return;
     }
 
-    const existingUser = users.find(
-      (user) => user.email === email.trim().toLowerCase()
-    );
-
-    if (existingUser) {
-      setMessage('An account with this email already exists.');
-      return;
-    }
-
-    const newUser = {
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      password: password
-    };
-
-    dispatch(addUser(newUser));
-
-    navigate('/login');
+        fetch('http://localhost:5000/api/users/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name.trim(), email: email.trim().toLowerCase(), password })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data._id) {
+          navigate('/login');
+        } else {
+          setMessage(data.message);
+        }
+      })
+      .catch(() => {
+        setMessage('Could not reach the server');
+      });
   }
 
   return (
