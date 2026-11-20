@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { finalizeEvent, savePreference, setAttendance, vote } from "../eventSlice";
+import { updateEvent } from "../eventSlice";
 import "./EventDetails.css";
 
 function mapLink(place) {
@@ -14,16 +14,23 @@ function EventDetails() {
   const dispatch = useDispatch();
   const events = useSelector((state) => state.event.events);
   const loading = useSelector((state) => state.event.loading);
-  const myVotes = useSelector((state) => state.event.myVotes);
-  const attendance = useSelector((state) => state.event.attendance);
-  const preferences = useSelector((state) => state.event.preferences);
   const currentUser = useSelector((state) => state.auth.currentUser);
   const [preference, setPreference] = useState("");
   const [dateIndex, setDateIndex] = useState(0);
   const [venueIndex, setVenueIndex] = useState(0);
   const [copied, setCopied] = useState(false);
 
-  const event = events.find((item) => String(item.id) === id);
+  const event = events.find((item) => String(item._id) === id);
+
+  function sendToApi(eventId, path, method, body) {
+    fetch('http://localhost:5000/api/events/' + eventId + path, {
+      method: method,
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.getItem('token') },
+      body: JSON.stringify(body)
+    })
+      .then(response => response.json())
+      .then(data => { if (data._id) { dispatch(updateEvent(data));} });
+  }
 
   function handleVote(eventId, kind, index) {
     if (!currentUser) {
@@ -31,7 +38,7 @@ function EventDetails() {
       return;
     }
 
-    dispatch(vote({ eventId, kind, index, email: currentUser.email }));
+    sendToApi(eventId, '/vote', 'POST', { kind, index });
   }
 
   function handleAttend(eventId, choice) {
@@ -40,12 +47,7 @@ function EventDetails() {
       return;
     }
 
-    dispatch(setAttendance({
-      eventId,
-      email: currentUser.email,
-      name: currentUser.name,
-      choice,
-    }));
+    sendToApi(eventId, '/attendance', 'POST', { choice });
   }
 
   function handleSave(e) {
@@ -56,24 +58,15 @@ function EventDetails() {
       return;
     }
 
-    dispatch(savePreference({
-      eventId: event.id,
-      email: currentUser.email,
-      name: currentUser.name,
-      text: preference.trim(),
-    }));
+    sendToApi(event._id, '/preference', 'POST', { text: preference.trim() });
   }
 
   function handleFinalize() {
-    dispatch(finalizeEvent({
-      eventId: event.id,
-      dateIndex: Number(dateIndex),
-      venueIndex: Number(venueIndex),
-    }));
+    sendToApi(event._id, '/finalize', 'PATCH', { dateIndex: Number(dateIndex), venueIndex: Number(venueIndex) });
   }
 
   function copyLink() {
-    const link = window.location.origin + "/event/" + event.id;
+    const link = window.location.origin + "/event/" + event._id;
     navigator.clipboard.writeText(link).then(() => {
       setCopied(true);
     });
@@ -94,9 +87,9 @@ function EventDetails() {
     );
   }
 
-  const isOrganizer = currentUser && currentUser.email === event.organizerEmail;
-  const responses = attendance[event.id] || [];
-  const preferenceList = preferences[event.id] || [];
+  const isOrganizer = currentUser && event.organizer && currentUser._id === event.organizer._id;
+  const responses = event.attendance;
+  const preferenceList = event.preferences;
   const myResponse = currentUser
     ? responses.find((item) => item.email === currentUser.email)
     : null;
@@ -105,8 +98,8 @@ function EventDetails() {
     ? preferenceList.find((item) => item.email === currentUser.email)
     : null;
 
-  const dateVotes = event.dates.map((item) => item.votes || 0);
-  const venueVotes = event.venues.map((item) => item.votes || 0);
+  const dateVotes = event.dates.map((item) => item.votes.length);
+  const venueVotes = event.venues.map((item) => item.votes.length);
   const topDateVotes = dateVotes.length ? Math.max(...dateVotes) : 0;
   const topVenueVotes = venueVotes.length ? Math.max(...venueVotes) : 0;
 
@@ -114,15 +107,11 @@ function EventDetails() {
 
   if (currentUser) {
     for (let i = 0; i < event.dates.length; i++) {
-      if (myVotes[currentUser.email + "-" + event.id + "-dates-" + i]) {
-        hasVoted = true;
-      }
+      if (event.dates[i].votes.includes(currentUser._id)) { hasVoted = true;}
     }
 
     for (let i = 0; i < event.venues.length; i++) {
-      if (myVotes[currentUser.email + "-" + event.id + "-venues-" + i]) {
-        hasVoted = true;
-      }
+      if (event.venues[i].votes.includes(currentUser._id)) { hasVoted = true;}
     }
   }
 
@@ -135,16 +124,16 @@ function EventDetails() {
       <p>{event.type}</p>
       {event.description && <p>{event.description}</p>}
 
-      <p>Share this link: {window.location.origin + "/event/" + event.id}</p>
+      <p>Share this link: {window.location.origin + "/event/" + event._id}</p>
       <button type="button" onClick={copyLink}>Copy link</button>
       {copied && <p className="lead-label">Link copied</p>}
 
       <h3>Date options</h3>
       {event.votingClosed && <p>Voting is closed.</p>}
       {event.dates.map((item, index) => {
-        const votes = item.votes || 0;
+        const votes = item.votes.length;
         const leading = votes > 0 && votes === topDateVotes;
-        const voted = currentUser && myVotes[currentUser.email + "-" + event.id + "-dates-" + index];
+        const voted = currentUser && item.votes.includes(currentUser._id);
 
         return (
           <div className={leading ? "choice leading" : "choice"} key={index}>
@@ -155,7 +144,7 @@ function EventDetails() {
             <p>{votes === 1 ? "1 vote" : votes + " votes"}</p>
             {leading && <p className="lead-label">Leading</p>}
             {!event.votingClosed && (
-              <button type="button" onClick={() => handleVote(event.id, "dates", index)}>
+              <button type="button" onClick={() => handleVote(event._id, "dates", index)}>
                 {voted ? "Remove vote" : "Vote"}
               </button>
             )}
@@ -165,9 +154,9 @@ function EventDetails() {
 
       <h3>Venue options</h3>
       {event.venues.map((item, index) => {
-        const votes = item.votes || 0;
+        const votes = item.votes.length;
         const leading = votes > 0 && votes === topVenueVotes;
-        const voted = currentUser && myVotes[currentUser.email + "-" + event.id + "-venues-" + index];
+        const voted = currentUser && item.votes.includes(currentUser._id);
 
         return (
           <div className={leading ? "choice leading" : "choice"} key={index}>
@@ -190,7 +179,7 @@ function EventDetails() {
             <p>{votes === 1 ? "1 vote" : votes + " votes"}</p>
             {leading && <p className="lead-label">Leading</p>}
             {!event.votingClosed && (
-              <button type="button" onClick={() => handleVote(event.id, "venues", index)}>
+              <button type="button" onClick={() => handleVote(event._id, "venues", index)}>
                 {voted ? "Remove vote" : "Vote"}
               </button>
             )}
@@ -237,27 +226,27 @@ function EventDetails() {
         <div>
           <h3>Will you attend?</h3>
           <button
-            className={myChoice === "attending" ? "attend selected" : "attend"}
-            onClick={() => handleAttend(event.id, "attending")}
+            className={myChoice === "yes" ? "attend selected" : "attend"}
+            onClick={() => handleAttend(event._id, "yes")}
           >
             Attending
           </button>
           <button
             className={myChoice === "maybe" ? "attend selected" : "attend"}
-            onClick={() => handleAttend(event.id, "maybe")}
+            onClick={() => handleAttend(event._id, "maybe")}
           >
             Maybe
           </button>
           <button
-            className={myChoice === "not attending" ? "attend selected" : "attend"}
-            onClick={() => handleAttend(event.id, "not attending")}
+            className={myChoice === "no" ? "attend selected" : "attend"}
+            onClick={() => handleAttend(event._id, "no")}
           >
             Not attending
           </button>
         </div>
       )}
 
-      {event.finalVenue && (
+      {event.finalDate && (
         <div>
           <h3>Final plan</h3>
           <p>

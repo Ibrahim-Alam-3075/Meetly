@@ -19,7 +19,7 @@ function EventCard({ event }) {
           : ""}
       </p>
       <p>{event.description}</p>
-      <Link to={"/event/" + event.id}>View event</Link>
+      <Link to={"/event/" + event._id}>View event</Link>
     </div>
   );
 }

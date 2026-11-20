@@ -11,6 +11,7 @@ function Navbar() {
   function handleLogout(){
 
     dispatch(logout());
+    localStorage.removeItem('token');
     navigate("/");
 
 

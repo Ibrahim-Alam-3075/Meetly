@@ -26,13 +26,13 @@ function Dashboard() {
       <h3>Upcoming</h3>
       {upcoming.length === 0 && <p>No upcoming events.</p>}
       {upcoming.map((event) => (
-        <EventCard key={event.id} event={event} />
+        <EventCard key={event._id} event={event} />
       ))}
 
       <h3>Past</h3>
       {past.length === 0 && <p>No past events.</p>}
       {past.map((event) => (
-        <EventCard key={event.id} event={event} />
+        <EventCard key={event._id} event={event} />
       ))}
     </div>
   );

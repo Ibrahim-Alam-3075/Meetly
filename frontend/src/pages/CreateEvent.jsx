@@ -78,20 +78,19 @@ function CreateEvent() {
       agendaText = agenda.trim();
     }
 
-    dispatch(addEvent({
-      id: Date.now(),
-      title: title.trim(),
-      type,
-      description: description.trim(),
-      date: filledDates[0].date,
-      dates: filledDates.map((item) => ({ ...item, votes: 0 })),
-      venues: filledVenues.map((item) => ({ ...item, votes: 0 })),
-      agenda: agendaText,
-      organizerEmail: currentUser.email,
-      votingClosed: false,
-    }));
-
-    navigate("/dashboard");
+    fetch('http://localhost:5000/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.getItem('token') },
+      body: JSON.stringify({ title: title.trim(), type, description: description.trim(), dates: filledDates, venues: filledVenues, agenda: agendaText })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data._id) {
+          dispatch(addEvent({ ...data, organizer: { _id: currentUser._id, name: currentUser.name, email: currentUser.email } }));
+          navigate("/dashboard");
+        } else { setError(data.message);}
+      })
+      .catch(() => { setError('Could not reach the server');});
   }
 
   if (!currentUser) {
