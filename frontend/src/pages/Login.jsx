@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { login } from "../authSlice";
 import "./Auth.css";
 
@@ -12,6 +12,8 @@ function Login() {
     const [message,setMessage] = useState('');
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const next = searchParams.get("next");
 
 
        function handleLogin(e){
@@ -27,7 +29,7 @@ fetch('http://localhost:5000/api/users/login', {
         if (data.token) {
             localStorage.setItem('token', data.token);
             dispatch(login({ _id: data._id, name: data.name, email: data.email }));
-            navigate("/dashboard");
+            navigate(next && next.startsWith("/event/") ? next : "/dashboard");
         } else {
             setMessage(data.message);
         }

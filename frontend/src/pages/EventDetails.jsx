@@ -76,6 +76,10 @@ function EventDetails() {
     return <div className="app-container"><p>Loading event details...</p></div>;
   }
 
+  if (!currentUser) {
+    return <div className="app-container"><p>Please log in to see this event.</p><Link to={"/login?next=/event/" + id}>Login</Link></div>;
+  }
+
   if (!event) {
     return (
       <div className="app-container">
