@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { updateEvent } from "../eventSlice";
@@ -19,8 +19,24 @@ function EventDetails() {
   const [dateIndex, setDateIndex] = useState(0);
   const [venueIndex, setVenueIndex] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [other, setOther] = useState(null);
+  const [fetched, setFetched] = useState(false);
 
-  const event = events.find((item) => String(item._id) === id);
+  const event = events.find((item) => String(item._id) === id) || other;
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (currentUser && token) {
+    fetch('http://localhost:5000/api/events/' + id, { headers: { Authorization: 'Bearer ' + token } })
+      .then(response => response.json())
+      .then(data => {
+        if (data._id) { setOther(data);}
+        setFetched(true);
+      })
+      .catch(() => { setFetched(true);});
+    }
+  }, [id, currentUser]);
 
   function sendToApi(eventId, path, method, body) {
     fetch('http://localhost:5000/api/events/' + eventId + path, {
@@ -78,6 +94,10 @@ function EventDetails() {
 
   if (!currentUser) {
     return <div className="app-container"><p>Please log in to see this event.</p><Link to={"/login?next=/event/" + id}>Login</Link></div>;
+  }
+
+  if (!event && !fetched) {
+    return <div className="app-container"><p>Loading event details...</p></div>;
   }
 
   if (!event) {

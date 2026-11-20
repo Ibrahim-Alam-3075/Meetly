@@ -8,7 +8,8 @@ const eventSlice = createSlice({
     setEvents(state, action) { state.events = action.payload; state.loading = false;},
     updateEvent(state, action) {
       const index = state.events.findIndex((item) => item._id === action.payload._id);
-      state.events[index] = { ...action.payload, organizer: state.events[index].organizer };
+      if (index === -1) { state.events.push(action.payload);}
+      else { state.events[index] = { ...action.payload, organizer: state.events[index].organizer };}
     },
   },
 });

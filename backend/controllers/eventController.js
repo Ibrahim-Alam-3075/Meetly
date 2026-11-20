@@ -1,9 +1,22 @@
 const Event = require('../models/Event');
 
+const hideOthers = (event, user) => {
+    const data = event.toObject();
+    const isOrganizer = String(event.organizer._id || event.organizer) === String(user._id);
+
+    if (!isOrganizer) {
+        data.attendance = data.attendance.filter((item) => String(item.user) === String(user._id));
+        data.preferences = data.preferences.filter((item) => String(item.user) === String(user._id));
+    }
+
+    return data;
+};
+
 exports.getEvents = async (req, res) => {
     try {
-        const events = await Event.find().sort({ createdAt: -1 }).populate('organizer', 'name email');
-        res.json(events);
+        const me = req.user._id;
+        const events = await Event.find({ $or: [{ organizer: me }, { 'dates.votes': me }, { 'venues.votes': me }, { 'attendance.user': me }, { 'preferences.user': me }] }).sort({ createdAt: -1 }).populate('organizer', 'name email');
+        res.json(events.map((event) => hideOthers(event, req.user)));
     } catch (err) {
         res.status(500).send(err.message);}
 };
@@ -15,7 +28,7 @@ exports.getEventById = async (req, res) => {
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });}
 
-        res.json(event);
+        res.json(hideOthers(event, req.user));
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -71,7 +84,7 @@ exports.voteEvent = async (req, res) => {
         }
 
         await event.save();
-        res.json(event);
+        res.json(hideOthers(event, req.user));
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -104,7 +117,7 @@ exports.finalizeEvent = async (req, res) => {
         event.finalVenue = { place: venueChoice.place, link: venueChoice.link };
 
         await event.save();
-        res.json(event);
+        res.json(hideOthers(event, req.user));
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -128,7 +141,7 @@ exports.setAttendance = async (req, res) => {
         }
 
         await event.save();
-        res.json(event);
+        res.json(hideOthers(event, req.user));
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -157,7 +170,7 @@ exports.savePreference = async (req, res) => {
         }
 
         await event.save();
-        res.json(event);
+        res.json(hideOthers(event, req.user));
     } catch (err) {
         res.status(500).send(err.message);
     }
