@@ -292,15 +292,19 @@ function EventDetails() {
 
       <div>
         <h3>Your preferences</h3>
-        <form onSubmit={handleSave}>
-          <label>Preference: </label>
-          <input
-            placeholder="e.g quiet place, dietary requirements, topic request"
-            value={preference}
-            onChange={(e) => setPreference(e.target.value)}
-          />
-          <button type="submit">Save</button>
-        </form>
+        {!event.votingClosed ? (
+          <form onSubmit={handleSave}>
+            <label>Preference: </label>
+            <input
+              placeholder="e.g quiet place, dietary requirements, topic request"
+              value={preference}
+              onChange={(e) => setPreference(e.target.value)}
+            />
+            <button type="submit">Save</button>
+          </form>
+        ) : (
+          <p>Voting is closed.</p>
+        )}
         {mySavedPreference && (
           <p>Saved preference: <strong>{mySavedPreference.text}</strong></p>
         )}

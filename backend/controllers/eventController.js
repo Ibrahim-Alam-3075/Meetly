@@ -99,6 +99,10 @@ exports.finalizeEvent = async (req, res) => {
             return res.status(404).json({ message: 'Event not found' });
         }
 
+        if (event.votingClosed) {
+            return res.status(400).json({ message: 'Voting is closed for this event' });
+        }
+
         if (event.organizer.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Only the organizer can finalize this event' });
         }
@@ -154,6 +158,10 @@ exports.savePreference = async (req, res) => {
 
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
+        }
+
+        if (event.votingClosed) {
+            return res.status(400).json({ message: 'Voting is closed for this event' });
         }
 
         const userId = req.user._id.toString();
