@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { updateEvent } from "../eventSlice";
+import { updateEvent, removeEvent } from "../eventSlice";
 import "./EventDetails.css";
 
 function mapLink(place) {
@@ -97,6 +97,23 @@ function EventDetails() {
     });
   }
 
+  function handleDeleteEvent() {
+    if (!window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
+      return;
+    }
+
+    fetch('http://localhost:5000/api/events/' + event._id, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+    })
+      .then(response => response.json())
+      .then(data => {
+        dispatch(removeEvent(event._id));
+        navigate('/dashboard');
+      })
+      .catch(err => console.error(err));
+  }
+
   const token = localStorage.getItem('token');
 
   if (token && !currentUser) {
@@ -172,6 +189,11 @@ function EventDetails() {
 
       <p>Share this link: {window.location.origin + "/event/" + event._id}</p>
       <button type="button" onClick={copyLink}>Copy link</button>
+      {isOrganizer && (
+        <button type="button" className="delete-event-btn" onClick={handleDeleteEvent}>
+          Delete event
+        </button>
+      )}
       {copied && <p className="lead-label">Link copied</p>}
 
       <h3>Date options</h3>

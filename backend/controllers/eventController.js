@@ -15,10 +15,22 @@ const hideOthers = (event, user) => {
 exports.getEvents = async (req, res) => {
     try {
         const me = req.user._id;
-        const events = await Event.find({ $or: [{ organizer: me }, { 'dates.votes': me }, { 'venues.votes': me }, { 'attendance.user': me }, { 'preferences.user': me }] }).sort({ createdAt: -1 }).populate('organizer', 'name email');
+        const events = await Event.find({
+            $or: [
+                { organizer: me },
+                { 'dates.votes': me },
+                { 'venues.votes': me },
+                { 'attendance.user': me },
+                { 'preferences.user': me }
+            ]
+        })
+            .sort({ createdAt: -1 })
+            .populate('organizer', 'name email');
+
         res.json(events.map((event) => hideOthers(event, req.user)));
     } catch (err) {
-        res.status(500).send(err.message);}
+        res.status(500).send(err.message);
+    }
 };
 
 exports.getEventById = async (req, res) => {
@@ -26,7 +38,8 @@ exports.getEventById = async (req, res) => {
         const event = await Event.findById(req.params.id).populate('organizer', 'name email');
 
         if (!event) {
-            return res.status(404).json({ message: 'Event not found' });}
+            return res.status(404).json({ message: 'Event not found' });
+        }
 
         res.json(hideOthers(event, req.user));
     } catch (err) {
@@ -39,13 +52,17 @@ exports.createEvent = async (req, res) => {
         const { title, type, description, dates, venues, agenda } = req.body;
 
         if (!title) {
-            return res.status(400).json({ message: 'Please enter a title' });}
+            return res.status(400).json({ message: 'Please enter a title' });
+        }
 
         if (!dates || dates.length === 0) {
-            return res.status(400).json({ message: 'Please add at least one date' });}
+            return res.status(400).json({ message: 'Please add at least one date' });
+        }
 
         const event = new Event({
-            title, type, description,
+            title,
+            type,
+            description,
             date: dates[0].date,
             dates: dates.map((item) => ({ date: item.date, time: item.time })),
             venues: (venues || []).map((item) => ({ place: item.place, link: item.link })),
@@ -133,7 +150,8 @@ exports.setAttendance = async (req, res) => {
         const event = await Event.findById(req.params.id);
 
         if (!event) {
-            return res.status(404).json({ message: 'Event not found' });}
+            return res.status(404).json({ message: 'Event not found' });
+        }
 
         const userId = req.user._id.toString();
         const existing = event.attendance.find((item) => item.user.toString() === userId);
@@ -175,6 +193,26 @@ exports.savePreference = async (req, res) => {
 
         await event.save();
         res.json(hideOthers(event, req.user));
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+};
+
+exports.deleteEvent = async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        const isOrganizer = String(event.organizer._id || event.organizer) === String(req.user._id);
+        if (!isOrganizer) {
+            return res.status(403).json({ message: 'Only the organizer can delete this event' });
+        }
+
+        await Event.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Event deleted successfully', id: req.params.id });
     } catch (err) {
         res.status(500).send(err.message);
     }
