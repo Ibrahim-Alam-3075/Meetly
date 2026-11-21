@@ -10,6 +10,7 @@ import CreateEvent from "./pages/CreateEvent";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import EventDetails from "./pages/EventDetails";
+import Profile from "./pages/Profile";
 import "./App.css";
 
 function App() {
@@ -40,7 +41,7 @@ function App() {
         .then(response => response.json())
         .then(data => {
           if (data._id) {
-            dispatch(login({ _id: data._id, name: data.name, email: data.email }));
+            dispatch(login({ _id: data._id, name: data.name, email: data.email, bio: data.bio || '' }));
           } else {
             localStorage.removeItem('token');
           }
@@ -59,6 +60,7 @@ function App() {
         <Route path="/create" element={<CreateEvent />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/event/:id" element={<EventDetails />} />
       </Routes>
     </Layout>

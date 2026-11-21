@@ -18,6 +18,11 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
       select: false
+    },
+    bio: {
+      type: String,
+      default: '',
+      trim: true
     }
   },
   {
@@ -26,4 +31,3 @@ const UserSchema = new mongoose.Schema(
 )
 
 module.exports = mongoose.model('User', UserSchema)
-

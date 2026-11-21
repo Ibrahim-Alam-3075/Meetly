@@ -33,7 +33,8 @@ const registerUser = async (req, res) => {
     return res.status(201).json({
       _id: user._id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      bio: user.bio || ''
     })
   } catch (error) {
     return res.status(500).json({ message: error.message })
@@ -64,6 +65,7 @@ const loginUser = async (req, res) => {
       token,
       name: user.name,
       email: user.email,
+      bio: user.bio || '',
       _id: user._id
     })
   } catch (error) {
@@ -71,15 +73,50 @@ const loginUser = async (req, res) => {
   }
 }
 
-
-
-
 const getMe = async (req, res) => {
   try {
     return res.status(200).json({
       _id: req.user._id,
       name: req.user.name,
-      email: req.user.email
+      email: req.user.email,
+      bio: req.user.bio || ''
+    })
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
+  }
+}
+
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('+password')
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    if (req.body.name) {
+      user.name = req.body.name.trim()
+    }
+
+    if (req.body.bio !== undefined) {
+      user.bio = req.body.bio.trim()
+    }
+
+    if (req.body.password) {
+      if (req.body.password.length < 4) {
+        return res.status(400).json({ message: 'Password must be at least 4 characters' })
+      }
+      const salt = await bcrypt.genSalt(10)
+      user.password = await bcrypt.hash(req.body.password, salt)
+    }
+
+    const updatedUser = await user.save()
+
+    return res.status(200).json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      bio: updatedUser.bio || ''
     })
   } catch (error) {
     return res.status(500).json({ message: error.message })
@@ -89,5 +126,6 @@ const getMe = async (req, res) => {
 module.exports = {
   registerUser,
   loginUser,
-  getMe
+  getMe,
+  updateProfile
 }

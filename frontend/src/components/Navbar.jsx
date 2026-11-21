@@ -27,6 +27,7 @@ function Navbar() {
         <Link to="/create">Create Event</Link>
         {!currentUser && <Link to="/login">Login</Link>}
         {!currentUser && <Link to="/register">Register</Link>}
+        {currentUser && <Link to="/profile">Profile</Link>}
         {currentUser && <p>Welcome, {currentUser.name}</p>}
         {currentUser && <button onClick={handleLogout}>Logout</button>}
       </nav>
