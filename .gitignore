@@ -29,5 +29,4 @@ dist-ssr
 .env.local
 .env.*.local
 
-# docker
-docker-compose.yml
+
