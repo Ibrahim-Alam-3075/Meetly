@@ -1,12 +1,14 @@
 const Event = require('../models/Event');
+const User = require('../models/User');
+const sendEmail = require('../utils/sendEmail');
 
 const hideOthers = (event, user) => {
     const data = event.toObject();
     const isOrganizer = String(event.organizer._id || event.organizer) === String(user._id);
 
     if (!isOrganizer) {
-        data.attendance = data.attendance.filter((item) => String(item.user) === String(user._id));
-        data.preferences = data.preferences.filter((item) => String(item.user) === String(user._id));
+        data.attendance = (data.attendance || []).filter((item) => String(item.user) === String(user._id));
+        data.preferences = (data.preferences || []).filter((item) => String(item.user) === String(user._id));
     }
 
     return data;
@@ -138,6 +140,44 @@ exports.finalizeEvent = async (req, res) => {
         event.finalVenue = { place: venueChoice.place, link: venueChoice.link };
 
         await event.save();
+
+        // Notify all voters and attendees about the finalized plan
+        try {
+            const voterIds = new Set();
+            (event.dates || []).forEach(d => (d.votes || []).forEach(id => voterIds.add(id.toString())));
+            (event.venues || []).forEach(v => (v.votes || []).forEach(id => voterIds.add(id.toString())));
+            (event.attendance || []).forEach(a => { if (a.user) voterIds.add(a.user.toString()); });
+
+            const voters = await User.find({ _id: { $in: Array.from(voterIds) } }).select('email name');
+            const emailSet = new Set(voters.map(u => u.email).filter(Boolean));
+            (event.attendance || []).forEach(a => { if (a.email) emailSet.add(a.email); });
+
+            const recipients = Array.from(emailSet);
+
+            if (recipients.length > 0) {
+                const venueDisplay = event.finalVenue.place
+                    ? event.finalVenue.place + (event.finalVenue.link ? ` (${event.finalVenue.link})` : '')
+                    : event.finalVenue.link;
+
+                sendEmail({
+                    to: recipients,
+                    subject: `Event Finalized: ${event.title}`,
+                    text: `Hello!\n\nThe event "${event.title}" has been finalized by the organizer.\n\nFinal Date: ${event.finalDate}${event.finalTime ? ' at ' + event.finalTime : ''}\nFinal Venue: ${venueDisplay}\n\nView details: http://localhost:5173/event/${event._id}\n\nBest regards,\nMeetly Team`,
+                    html: `
+                        <h2>Event Finalized: ${event.title}</h2>
+                        <p>The organizer has confirmed the final date and venue for <strong>${event.title}</strong>.</p>
+                        <ul>
+                            <li><strong>Date:</strong> ${event.finalDate}${event.finalTime ? ' at ' + event.finalTime : ''}</li>
+                            <li><strong>Venue:</strong> ${venueDisplay}</li>
+                        </ul>
+                        <p><a href="http://localhost:5173/event/${event._id}">Click here to view event details & map</a></p>
+                    `
+                }).catch(err => console.error('Email notification background error:', err));
+            }
+        } catch (emailErr) {
+            console.error('Email notification error:', emailErr.message);
+        }
+
         res.json(hideOthers(event, req.user));
     } catch (err) {
         res.status(500).send(err.message);
@@ -154,7 +194,7 @@ exports.setAttendance = async (req, res) => {
         }
 
         const userId = req.user._id.toString();
-        const existing = event.attendance.find((item) => item.user.toString() === userId);
+        const existing = (event.attendance || []).find((item) => item.user.toString() === userId);
 
         if (existing) {
             existing.choice = choice;
@@ -183,7 +223,7 @@ exports.savePreference = async (req, res) => {
         }
 
         const userId = req.user._id.toString();
-        const existing = event.preferences.find((item) => item.user.toString() === userId);
+        const existing = (event.preferences || []).find((item) => item.user.toString() === userId);
 
         if (existing) {
             existing.text = text;
