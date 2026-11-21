@@ -21,6 +21,8 @@ function EventDetails() {
   const [copied, setCopied] = useState(false);
   const [other, setOther] = useState(null);
   const [fetched, setFetched] = useState(false);
+  const [editingAgenda, setEditingAgenda] = useState(false);
+  const [agendaText, setAgendaText] = useState("");
 
   const event = events.find((item) => String(item._id) === id) || other;
 
@@ -114,6 +116,17 @@ function EventDetails() {
       .catch(err => console.error(err));
   }
 
+  function handleStartEditAgenda() {
+    setAgendaText(event.agenda || "");
+    setEditingAgenda(true);
+  }
+
+  function handleSaveAgenda(e) {
+    e.preventDefault();
+    sendToApi(event._id, '/agenda', 'PATCH', { agenda: agendaText });
+    setEditingAgenda(false);
+  }
+
   const token = localStorage.getItem('token');
 
   if (token && !currentUser) {
@@ -148,7 +161,7 @@ function EventDetails() {
     );
   }
 
-  const isOrganizer = currentUser && event.organizer && (currentUser._id === (event.organizer._id || event.organizer));
+  const isOrganizer = currentUser && event.organizer && currentUser._id === event.organizer._id;
   const responses = Array.isArray(event.attendance) ? event.attendance : [];
   const preferenceList = Array.isArray(event.preferences) ? event.preferences : [];
   const myResponse = currentUser
@@ -377,10 +390,49 @@ function EventDetails() {
         </div>
       )}
 
-      {event.agenda && (
-        <div>
-          <h3>Meeting Agenda</h3>
-          <p>{event.agenda}</p>
+      {(event.type === "Meeting" || event.agenda) && (
+        <div className="agenda-box">
+          <div className="agenda-header">
+            <h3>Meeting Agenda</h3>
+            {isOrganizer && !editingAgenda && (
+              <button
+                type="button"
+                className="edit-agenda-btn"
+                onClick={handleStartEditAgenda}
+              >
+                {event.agenda ? "Edit Agenda" : "Add Agenda"}
+              </button>
+            )}
+          </div>
+
+          {editingAgenda ? (
+            <form onSubmit={handleSaveAgenda} className="agenda-form">
+              <textarea
+                rows="4"
+                placeholder="List topics or discussion points (one per line)..."
+                value={agendaText}
+                onChange={(e) => setAgendaText(e.target.value)}
+              />
+              <div className="agenda-actions">
+                <button type="submit">Save Agenda</button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setEditingAgenda(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div>
+              {event.agenda ? (
+                <p className="agenda-text">{event.agenda}</p>
+              ) : (
+                <p className="muted-text">No agenda specified yet.</p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

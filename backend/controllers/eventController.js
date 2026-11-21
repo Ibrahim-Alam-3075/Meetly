@@ -4,7 +4,8 @@ const sendEmail = require('../utils/sendEmail');
 
 const hideOthers = (event, user) => {
     const data = event.toObject();
-    const isOrganizer = String(event.organizer._id || event.organizer) === String(user._id);
+    const organizerId = data.organizer._id ? data.organizer._id.toString() : data.organizer.toString();
+    const isOrganizer = organizerId === user._id.toString();
 
     if (!isOrganizer) {
         data.attendance = (data.attendance || []).filter((item) => String(item.user) === String(user._id));
@@ -73,6 +74,7 @@ exports.createEvent = async (req, res) => {
         });
 
         await event.save();
+        await event.populate('organizer', 'name email');
         res.status(201).json(event);
     } catch (err) {
         res.status(500).send(err.message);
@@ -82,7 +84,7 @@ exports.createEvent = async (req, res) => {
 exports.voteEvent = async (req, res) => {
     try {
         const { kind, index } = req.body;
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findById(req.params.id).populate('organizer', 'name email');
 
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
@@ -112,7 +114,7 @@ exports.voteEvent = async (req, res) => {
 exports.finalizeEvent = async (req, res) => {
     try {
         const { dateIndex, venueIndex } = req.body;
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findById(req.params.id).populate('organizer', 'name email');
 
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
@@ -122,7 +124,7 @@ exports.finalizeEvent = async (req, res) => {
             return res.status(400).json({ message: 'Voting is closed for this event' });
         }
 
-        if (event.organizer.toString() !== req.user._id.toString()) {
+        if (event.organizer._id.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Only the organizer can finalize this event' });
         }
 
@@ -187,7 +189,7 @@ exports.finalizeEvent = async (req, res) => {
 exports.setAttendance = async (req, res) => {
     try {
         const { choice } = req.body;
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findById(req.params.id).populate('organizer', 'name email');
 
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
@@ -212,7 +214,7 @@ exports.setAttendance = async (req, res) => {
 exports.savePreference = async (req, res) => {
     try {
         const { text } = req.body;
-        const event = await Event.findById(req.params.id);
+        const event = await Event.findById(req.params.id).populate('organizer', 'name email');
 
         if (!event) {
             return res.status(404).json({ message: 'Event not found' });
@@ -246,13 +248,33 @@ exports.deleteEvent = async (req, res) => {
             return res.status(404).json({ message: 'Event not found' });
         }
 
-        const isOrganizer = String(event.organizer._id || event.organizer) === String(req.user._id);
-        if (!isOrganizer) {
+        if (!event.organizer.equals(req.user._id)) {
             return res.status(403).json({ message: 'Only the organizer can delete this event' });
         }
 
         await Event.findByIdAndDelete(req.params.id);
         res.json({ message: 'Event deleted successfully', id: req.params.id });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+};
+
+exports.updateAgenda = async (req, res) => {
+    try {
+        const { agenda } = req.body;
+        const event = await Event.findById(req.params.id).populate('organizer', 'name email');
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        if (event.organizer._id.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Only the organizer can manage the agenda' });
+        }
+
+        event.agenda = agenda ? agenda.trim() : '';
+        await event.save();
+        res.json(hideOthers(event, req.user));
     } catch (err) {
         res.status(500).send(err.message);
     }

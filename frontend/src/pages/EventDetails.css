@@ -66,3 +66,60 @@
   margin-left: 8px;
   cursor: pointer;
 }
+
+.agenda-box {
+  background-color: white;
+  border: 1px solid lightgray;
+  padding: 14px;
+  margin: 16px 0;
+}
+
+.agenda-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.edit-agenda-btn {
+  background-color: steelblue;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.agenda-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid lightgray;
+  box-sizing: border-box;
+  margin-top: 8px;
+  font-family: inherit;
+}
+
+.agenda-actions {
+  margin-top: 8px;
+}
+
+.agenda-actions button {
+  padding: 6px 12px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.agenda-actions .cancel-btn {
+  background-color: whitesmoke;
+  color: dimgray;
+  border: 1px solid lightgray;
+}
+
+.agenda-text {
+  white-space: pre-wrap;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.muted-text {
+  color: gray;
+  font-style: italic;
+}
