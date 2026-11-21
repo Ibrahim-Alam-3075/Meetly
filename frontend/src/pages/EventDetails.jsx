@@ -28,15 +28,24 @@ function EventDetails() {
     const token = localStorage.getItem('token');
 
     if (currentUser && token) {
-    fetch('http://localhost:5000/api/events/' + id, { headers: { Authorization: 'Bearer ' + token } })
-      .then(response => response.json())
-      .then(data => {
-        if (data._id) { setOther(data);}
-        setFetched(true);
-      })
-      .catch(() => { setFetched(true);});
+      fetch('http://localhost:5000/api/events/' + id, { headers: { Authorization: 'Bearer ' + token } })
+        .then(response => response.json())
+        .then(data => {
+          if (data && data._id) { setOther(data); }
+          setFetched(true);
+        })
+        .catch(() => { setFetched(true); });
     }
   }, [id, currentUser]);
+
+  useEffect(() => {
+    const myPref = currentUser && event && Array.isArray(event.preferences)
+      ? event.preferences.find((item) => item.email === currentUser.email)
+      : null;
+    if (myPref && myPref.text) {
+      setPreference(myPref.text);
+    }
+  }, [currentUser, event]);
 
   function sendToApi(eventId, path, method, body) {
     fetch('http://localhost:5000/api/events/' + eventId + path, {
@@ -45,7 +54,7 @@ function EventDetails() {
       body: JSON.stringify(body)
     })
       .then(response => response.json())
-      .then(data => { if (data._id) { dispatch(updateEvent(data));} });
+      .then(data => { if (data && data._id) { dispatch(updateEvent(data)); } });
   }
 
   function handleVote(eventId, kind, index) {
@@ -88,12 +97,23 @@ function EventDetails() {
     });
   }
 
-  if (loading) {
-    return <div className="app-container"><p>Loading event details...</p></div>;
+  const token = localStorage.getItem('token');
+
+  if (token && !currentUser) {
+    return <div className="app-container"><p>Loading session...</p></div>;
   }
 
   if (!currentUser) {
-    return <div className="app-container"><p>Please log in to see this event.</p><Link to={"/login?next=/event/" + id}>Login</Link></div>;
+    return (
+      <div className="app-container">
+        <p>Please log in to see this event.</p>
+        <Link to={"/login?next=/event/" + id}>Login</Link>
+      </div>
+    );
+  }
+
+  if (loading && !event && !fetched) {
+    return <div className="app-container"><p>Loading event details...</p></div>;
   }
 
   if (!event && !fetched) {
@@ -111,9 +131,9 @@ function EventDetails() {
     );
   }
 
-  const isOrganizer = currentUser && event.organizer && currentUser._id === event.organizer._id;
-  const responses = event.attendance;
-  const preferenceList = event.preferences;
+  const isOrganizer = currentUser && event.organizer && (currentUser._id === (event.organizer._id || event.organizer));
+  const responses = Array.isArray(event.attendance) ? event.attendance : [];
+  const preferenceList = Array.isArray(event.preferences) ? event.preferences : [];
   const myResponse = currentUser
     ? responses.find((item) => item.email === currentUser.email)
     : null;
@@ -122,20 +142,22 @@ function EventDetails() {
     ? preferenceList.find((item) => item.email === currentUser.email)
     : null;
 
-  const dateVotes = event.dates.map((item) => item.votes.length);
-  const venueVotes = event.venues.map((item) => item.votes.length);
+  const dates = Array.isArray(event.dates) ? event.dates : [];
+  const venues = Array.isArray(event.venues) ? event.venues : [];
+  const dateVotes = dates.map((item) => (Array.isArray(item.votes) ? item.votes.length : (item.votes || 0)));
+  const venueVotes = venues.map((item) => (Array.isArray(item.votes) ? item.votes.length : (item.votes || 0)));
   const topDateVotes = dateVotes.length ? Math.max(...dateVotes) : 0;
   const topVenueVotes = venueVotes.length ? Math.max(...venueVotes) : 0;
 
   let hasVoted = false;
 
   if (currentUser) {
-    for (let i = 0; i < event.dates.length; i++) {
-      if (event.dates[i].votes.includes(currentUser._id)) { hasVoted = true;}
+    for (let i = 0; i < dates.length; i++) {
+      if (Array.isArray(dates[i].votes) && dates[i].votes.includes(currentUser._id)) { hasVoted = true; }
     }
 
-    for (let i = 0; i < event.venues.length; i++) {
-      if (event.venues[i].votes.includes(currentUser._id)) { hasVoted = true;}
+    for (let i = 0; i < venues.length; i++) {
+      if (Array.isArray(venues[i].votes) && venues[i].votes.includes(currentUser._id)) { hasVoted = true; }
     }
   }
 
@@ -154,10 +176,10 @@ function EventDetails() {
 
       <h3>Date options</h3>
       {event.votingClosed && <p>Voting is closed.</p>}
-      {event.dates.map((item, index) => {
-        const votes = item.votes.length;
+      {dates.map((item, index) => {
+        const votes = Array.isArray(item.votes) ? item.votes.length : (item.votes || 0);
         const leading = votes > 0 && votes === topDateVotes;
-        const voted = currentUser && item.votes.includes(currentUser._id);
+        const voted = currentUser && Array.isArray(item.votes) && item.votes.includes(currentUser._id);
 
         return (
           <div className={leading ? "choice leading" : "choice"} key={index}>
@@ -177,10 +199,10 @@ function EventDetails() {
       })}
 
       <h3>Venue options</h3>
-      {event.venues.map((item, index) => {
-        const votes = item.votes.length;
+      {venues.map((item, index) => {
+        const votes = Array.isArray(item.votes) ? item.votes.length : (item.votes || 0);
         const leading = votes > 0 && votes === topVenueVotes;
-        const voted = currentUser && item.votes.includes(currentUser._id);
+        const voted = currentUser && Array.isArray(item.votes) && item.votes.includes(currentUser._id);
 
         return (
           <div className={leading ? "choice leading" : "choice"} key={index}>
@@ -221,7 +243,7 @@ function EventDetails() {
               value={dateIndex}
               onChange={(e) => setDateIndex(e.target.value)}
             >
-              {event.dates.map((item, index) => (
+              {dates.map((item, index) => (
                 <option value={index} key={index}>
                   {item.date}{item.time ? " at " + item.time : ""}
                 </option>
@@ -235,7 +257,7 @@ function EventDetails() {
               value={venueIndex}
               onChange={(e) => setVenueIndex(e.target.value)}
             >
-              {event.venues.map((item, index) => (
+              {venues.map((item, index) => (
                 <option value={index} key={index}>
                   {item.place || item.link}
                 </option>
@@ -246,29 +268,43 @@ function EventDetails() {
         </div>
       )}
 
-      {(hasVoted || event.votingClosed) && (
-        <div>
-          <h3>Will you attend?</h3>
-          <button
-            className={myChoice === "yes" ? "attend selected" : "attend"}
-            onClick={() => handleAttend(event._id, "yes")}
-          >
-            Attending
-          </button>
-          <button
-            className={myChoice === "maybe" ? "attend selected" : "attend"}
-            onClick={() => handleAttend(event._id, "maybe")}
-          >
-            Maybe
-          </button>
-          <button
-            className={myChoice === "no" ? "attend selected" : "attend"}
-            onClick={() => handleAttend(event._id, "no")}
-          >
-            Not attending
-          </button>
-        </div>
-      )}
+      <div>
+        <h3>Will you attend?</h3>
+        <button
+          className={myChoice === "yes" ? "attend selected" : "attend"}
+          onClick={() => handleAttend(event._id, "yes")}
+        >
+          Attending
+        </button>
+        <button
+          className={myChoice === "maybe" ? "attend selected" : "attend"}
+          onClick={() => handleAttend(event._id, "maybe")}
+        >
+          Maybe
+        </button>
+        <button
+          className={myChoice === "no" ? "attend selected" : "attend"}
+          onClick={() => handleAttend(event._id, "no")}
+        >
+          Not attending
+        </button>
+      </div>
+
+      <div>
+        <h3>Your preferences</h3>
+        <form onSubmit={handleSave}>
+          <label>Preference: </label>
+          <input
+            placeholder="e.g quiet place, dietary requirements, topic request"
+            value={preference}
+            onChange={(e) => setPreference(e.target.value)}
+          />
+          <button type="submit">Save</button>
+        </form>
+        {mySavedPreference && (
+          <p>Saved preference: <strong>{mySavedPreference.text}</strong></p>
+        )}
+      </div>
 
       {event.finalDate && (
         <div>
@@ -277,8 +313,8 @@ function EventDetails() {
             {event.finalDate}
             {event.finalTime ? " at " + event.finalTime : ""}
           </p>
-          <p>{event.finalVenue.place} {event.finalVenue.link}</p>
-          {event.finalVenue.place && (
+          <p>{event.finalVenue?.place} {event.finalVenue?.link}</p>
+          {event.finalVenue?.place && (
             <div>
               <p>
                 <a href={mapLink(event.finalVenue.place)} target="_blank" rel="noreferrer">
@@ -292,14 +328,9 @@ function EventDetails() {
               />
             </div>
           )}
-          <form onSubmit={handleSave}>
-            <label>Your preferences: </label>
-            <input placeholder="e.g quiet place, 6 person seating" value={preference} onChange={(e) => setPreference(e.target.value)} />
-            <button type="submit">Save</button>
-          </form>
 
           <h3>Your summary</h3>
-          <p>Venue: {event.finalVenue.place} {event.finalVenue.link}</p>
+          <p>Venue: {event.finalVenue?.place} {event.finalVenue?.link}</p>
           <p>Attendance: {myChoice || "Not chosen"}</p>
           <p>Preferences: {mySavedPreference ? mySavedPreference.text : "Not chosen"}</p>
         </div>

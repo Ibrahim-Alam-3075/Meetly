@@ -156,10 +156,6 @@ exports.savePreference = async (req, res) => {
             return res.status(404).json({ message: 'Event not found' });
         }
 
-        if (!event.finalDate) {
-            return res.status(400).json({ message: 'Event is not finalized yet' });
-        }
-
         const userId = req.user._id.toString();
         const existing = event.preferences.find((item) => item.user.toString() === userId);
 
