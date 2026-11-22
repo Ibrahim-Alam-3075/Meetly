@@ -39,6 +39,14 @@ a:hover {
   color: #2f6690;
 }
 
+h2 {
+  font-size: 28px;
+}
+
+h3 {
+  font-size: 20px;
+}
+
 .choice, .event-card, .auth-card, .profile-form, .step, .box, .create-form {
   background-color: white;
   border: 1px solid lightgray;

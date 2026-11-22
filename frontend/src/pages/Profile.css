@@ -1,5 +1,9 @@
-.profile-form {
+.profile-page {
   max-width: 480px;
+  margin: 0 auto;
+}
+
+.profile-form {
   margin-top: 12px;
 }
 
@@ -40,7 +44,7 @@
   color: darkgreen;
   padding: 8px 12px;
   border: 1px solid seagreen;
-  max-width: 480px;
+  border-radius: 8px;
 }
 
 .profile-error {
@@ -48,5 +52,5 @@
   color: firebrick;
   padding: 8px 12px;
   border: 1px solid crimson;
-  max-width: 480px;
+  border-radius: 8px;
 }

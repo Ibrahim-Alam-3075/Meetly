@@ -5,6 +5,7 @@ import "./Home.css";
 
 function Home() {
 const currentUser = useSelector((state) => state.auth.currentUser);
+const buttonStyle = { display: "inline-block", backgroundColor: "steelblue", color: "white", padding: "10px 20px", borderRadius: "6px", textDecoration: "none" };
 
   return (
     <div className="app-container">
@@ -31,12 +32,12 @@ const currentUser = useSelector((state) => state.auth.currentUser);
 
       {(!currentUser) && (
         <div>
-          <Link to="/register">Get Started! Register Now!</Link></div>
+          <Link to="/register" style={buttonStyle}>Get Started! Register Now!</Link></div>
       )} 
 
       {(currentUser) && (
         <div><p>Welcome back, {currentUser.name}!</p>
-          <Link to="/dashboard">Go to Dashboard</Link></div>
+          <Link to="/dashboard" style={buttonStyle}>Go to Dashboard</Link></div>
       )}
 
       

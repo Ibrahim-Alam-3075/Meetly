@@ -92,7 +92,7 @@ function Profile() {
   }
 
   return (
-    <div className="app-container">
+    <div className="app-container profile-page">
       <h2>Edit Profile</h2>
 
       {message && <p className="profile-success">{message}</p>}
