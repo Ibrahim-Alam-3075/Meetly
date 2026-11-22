@@ -6,6 +6,9 @@ function Layout({ children }) {
     <div className="layout">
       <Navbar />
       <main className="page">{children}</main>
+      <footer className="footer">
+        <p>Meetly 2026</p>
+      </footer>
     </div>
   );
 }
