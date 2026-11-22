@@ -39,9 +39,19 @@ a:hover {
   color: #2f6690;
 }
 
-.choice, .final-box, .agenda-box, .event-card, .auth-card, .profile-form, .step, .box {
+.choice, .event-card, .auth-card, .profile-form, .step, .box, .create-form {
   background-color: white;
   border: 1px solid lightgray;
   border-radius: 8px;
   padding: 14px;
+}
+
+.secondary {
+  background-color: white;
+  color: steelblue;
+  border: 1px solid steelblue;
+}
+
+.secondary:hover {
+  background-color: whitesmoke;
 }

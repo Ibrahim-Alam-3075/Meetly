@@ -284,7 +284,7 @@ function EventDetails() {
       </div>
 
       {isOrganizer && !event.votingClosed && (
-        <div className="final-box">
+        <div className="box final-box">
           <h3>Confirm the final plan</h3>
           <div className="form-group">
             <label htmlFor="final-date">Final date</label>
@@ -406,7 +406,7 @@ function EventDetails() {
       )}
 
       {(event.type === "Meeting" || event.agenda) && (
-        <div className="agenda-box">
+        <div className="box">
           <div className="agenda-header">
             <h3>Meeting Agenda</h3>
             {isOrganizer && !editingAgenda && (

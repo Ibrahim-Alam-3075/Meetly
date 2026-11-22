@@ -149,13 +149,13 @@ function CreateEvent() {
               onChange={(e) => handleDateChange(index, "time", e.target.value)}
             />
             {dates.length > 1 && (
-              <button type="button" onClick={() => removeDate(index)}>
+              <button type="button" className="secondary" onClick={() => removeDate(index)}>
                 Remove
               </button>
             )}
           </div>
         ))}
-        <button type="button" onClick={addDate}>
+        <button type="button" className="secondary" onClick={addDate}>
           Add another date
         </button>
 
@@ -174,13 +174,13 @@ function CreateEvent() {
               onChange={(e) => handleVenueChange(index, "link", e.target.value)}
             />
             {venues.length > 1 && (
-              <button type="button" onClick={() => removeVenue(index)}>
+              <button type="button" className="secondary" onClick={() => removeVenue(index)}>
                 Remove
               </button>
             )}
           </div>
         ))}
-        <button type="button" onClick={addVenue}>
+        <button type="button" className="secondary" onClick={addVenue}>
           Add another venue
         </button>
 

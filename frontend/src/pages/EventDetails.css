@@ -43,10 +43,6 @@
   background-color: seagreen;
 }
 
-.final-box {
-  margin: 16px 0;
-}
-
 .final-box select,
 .final-box button {
   margin: 6px 8px 6px 0;
@@ -68,10 +64,6 @@
 
 .delete-event-btn:hover {
   background-color: darkred;
-}
-
-.agenda-box {
-  margin: 16px 0;
 }
 
 .agenda-header {

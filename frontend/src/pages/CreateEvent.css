@@ -1,3 +1,7 @@
+.create-form {
+  max-width: 600px;
+}
+
 .form-group {
   margin-bottom: 12px;
 }
@@ -11,7 +15,6 @@
 .create-form select,
 .create-form textarea {
   width: 100%;
-  max-width: 420px;
 }
 
 .create-form h3 {
@@ -20,11 +23,15 @@
 }
 
 .option-row {
-  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .option-row input {
-  margin-bottom: 6px;
+  width: auto;
+  flex: 1 1 150px;
 }
 
 .create-form button {

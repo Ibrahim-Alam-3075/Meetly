@@ -27,7 +27,7 @@ exports.getEvents = async (req, res) => {
                 { 'preferences.user': me }
             ]
         })
-            .sort({ createdAt: -1 })
+            .sort({ date: 1 })
             .populate('organizer', 'name email');
 
         res.json(events.map((event) => hideOthers(event, req.user)));
