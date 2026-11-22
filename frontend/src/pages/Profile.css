@@ -1,8 +1,5 @@
 .profile-form {
   max-width: 480px;
-  background-color: white;
-  border: 1px solid lightgray;
-  padding: 16px;
   margin-top: 12px;
 }
 
@@ -19,9 +16,6 @@
 .profile-form input,
 .profile-form textarea {
   width: 100%;
-  padding: 8px;
-  border: 1px solid lightgray;
-  box-sizing: border-box;
 }
 
 .disabled-input {
@@ -38,11 +32,6 @@
 }
 
 .profile-form button {
-  background-color: steelblue;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  cursor: pointer;
   margin-top: 8px;
 }
 
@@ -61,4 +50,3 @@
   border: 1px solid crimson;
   max-width: 480px;
 }
-

@@ -1,4 +1,7 @@
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -16,7 +19,8 @@
 .navbar nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  align-items: center;
+  gap: 14px;
 }
 
 .navbar a {
@@ -26,7 +30,23 @@
 }
 
 .navbar a:hover {
+  color: white;
   text-decoration: underline;
+}
+
+.navbar nav p {
+  color: lightcyan;
+  font-size: 14px;
+}
+
+.navbar button {
+  background-color: white;
+  color: steelblue;
+  padding: 4px 12px;
+}
+
+.navbar button:hover {
+  background-color: whitesmoke;
 }
 
 @media (max-width: 600px) {

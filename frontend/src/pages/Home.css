@@ -7,9 +7,6 @@
 
 .step {
   flex: 1 1 200px;
-  background-color: white;
-  border: 1px solid lightgray;
-  padding: 10px;
 }
 
 .step h3 {

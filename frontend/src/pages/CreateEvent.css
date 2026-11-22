@@ -12,8 +12,6 @@
 .create-form textarea {
   width: 100%;
   max-width: 420px;
-  padding: 6px;
-  border: 1px solid gray;
 }
 
 .create-form h3 {
@@ -32,13 +30,9 @@
 .create-form button {
   margin-right: 8px;
   margin-bottom: 8px;
-  padding: 6px 12px;
 }
 
 .submit-button {
-  background-color: steelblue;
-  color: white;
-  border: none;
   margin-top: 8px;
 }
 

@@ -1,7 +1,4 @@
 .choice {
-  background-color: white;
-  border: 1px solid lightgray;
-  padding: 12px;
   margin-bottom: 10px;
 }
 
@@ -14,22 +11,7 @@
   color: darkgreen;
 }
 
-.choice button {
-  background-color: steelblue;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-}
-
-.choice a {
-  color: steelblue;
-}
-
 .attend {
-  background-color: steelblue;
-  color: white;
-  border: none;
-  padding: 6px 12px;
   margin-right: 8px;
 }
 
@@ -38,15 +20,11 @@
 }
 
 .final-box {
-  background-color: white;
-  border: 1px solid lightgray;
-  padding: 12px;
   margin: 16px 0;
 }
 
 .final-box select,
 .final-box button {
-  padding: 6px;
   margin: 6px 8px 6px 0;
 }
 
@@ -55,22 +33,20 @@
   max-width: 480px;
   height: 220px;
   border: 1px solid lightgray;
+  border-radius: 8px;
   margin-top: 8px;
 }
 
 .delete-event-btn {
   background-color: crimson;
-  color: white;
-  border: none;
-  padding: 6px 12px;
   margin-left: 8px;
-  cursor: pointer;
+}
+
+.delete-event-btn:hover {
+  background-color: darkred;
 }
 
 .agenda-box {
-  background-color: white;
-  border: 1px solid lightgray;
-  padding: 14px;
   margin: 16px 0;
 }
 
@@ -80,21 +56,9 @@
   justify-content: space-between;
 }
 
-.edit-agenda-btn {
-  background-color: steelblue;
-  color: white;
-  border: none;
-  padding: 4px 10px;
-  cursor: pointer;
-}
-
 .agenda-form textarea {
   width: 100%;
-  padding: 8px;
-  border: 1px solid lightgray;
-  box-sizing: border-box;
   margin-top: 8px;
-  font-family: inherit;
 }
 
 .agenda-actions {
@@ -102,9 +66,7 @@
 }
 
 .agenda-actions button {
-  padding: 6px 12px;
   margin-right: 8px;
-  cursor: pointer;
 }
 
 .agenda-actions .cancel-btn {
