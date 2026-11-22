@@ -101,3 +101,14 @@
   color: gray;
   font-style: italic;
 }
+
+
+@media (max-width: 600px) {
+  .choice {
+    min-height: 0;
+  }
+
+  .share-link {
+    display: none;
+  }
+}

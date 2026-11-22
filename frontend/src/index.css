@@ -63,3 +63,9 @@ h3 {
 .secondary:hover {
   background-color: whitesmoke;
 }
+
+@media (max-width: 600px) {
+  h2 {
+    font-size: 20px;
+  }
+}

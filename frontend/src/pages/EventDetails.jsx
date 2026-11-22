@@ -207,7 +207,7 @@ function EventDetails() {
       <p>{event.type}</p>
       {event.description && <p>{event.description}</p>}
 
-      <p>Share this link: {window.location.origin + "/event/" + event._id}</p>
+      <p className="share-link">Share this link: {window.location.origin + "/event/" + event._id}</p>
       <button type="button" onClick={copyLink}>Copy link</button>
       {isOrganizer && (
         <button type="button" className="delete-event-btn" onClick={handleDeleteEvent}>
