@@ -8,6 +8,12 @@ function mapLink(place) {
   return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(place);
 }
 
+function choiceText(choice) {
+  if (choice === "yes") { return "Attending"; }
+  if (choice === "no") { return "Not attending"; }
+  return "Maybe";
+}
+
 function EventDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -379,7 +385,7 @@ function EventDetails() {
 
           <h3>Your summary</h3>
           <p>Venue: {event.finalVenue?.place} {event.finalVenue?.link}</p>
-          <p>Attendance: {myChoice || "Not chosen"}</p>
+          <p>Attendance: {myChoice ? choiceText(myChoice) : "Not chosen"}</p>
           <p>Preferences: {mySavedPreference ? mySavedPreference.text : "Not chosen"}</p>
         </div>
       )}
@@ -389,7 +395,7 @@ function EventDetails() {
           <h3>Participant list</h3>
           {responses.length === 0 && <p>No responses yet.</p>}
           {responses.map((item) => (
-            <p key={item.email}>{item.name}: {item.choice}</p>
+            <p key={item.email}>{item.name}: {choiceText(item.choice)}</p>
           ))}
           <h3>Preference summary</h3>
           {preferenceList.length === 0 && <p>No preferences yet.</p>}
