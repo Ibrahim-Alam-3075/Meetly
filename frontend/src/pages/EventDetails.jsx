@@ -196,6 +196,7 @@ function EventDetails() {
       <p>
         <Link to="/dashboard">Back to dashboard</Link>
       </p>
+      <div className="box">
       <h2>{event.title}</h2>
       <p>{event.type}</p>
       {event.description && <p>{event.description}</p>}
@@ -208,7 +209,10 @@ function EventDetails() {
         </button>
       )}
       {copied && <p className="lead-label">Link copied</p>}
+      </div>
 
+      <div className="options">
+      <div className="option-column">
       <h3>Date options</h3>
       {event.votingClosed && <p>Voting is closed.</p>}
       {dates.map((item, index) => {
@@ -233,6 +237,9 @@ function EventDetails() {
         );
       })}
 
+      </div>
+
+      <div className="option-column">
       <h3>Venue options</h3>
       {venues.map((item, index) => {
         const votes = Array.isArray(item.votes) ? item.votes.length : (item.votes || 0);
@@ -267,6 +274,8 @@ function EventDetails() {
           </div>
         );
       })}
+      </div>
+      </div>
 
       {isOrganizer && !event.votingClosed && (
         <div className="final-box">
@@ -303,7 +312,7 @@ function EventDetails() {
         </div>
       )}
 
-      <div>
+      <div className="box">
         <h3>Will you attend?</h3>
         <button
           className={myChoice === "yes" ? "attend selected" : "attend"}
@@ -325,7 +334,7 @@ function EventDetails() {
         </button>
       </div>
 
-      <div>
+      <div className="box">
         <h3>Your preferences</h3>
         {!event.votingClosed ? (
           <form onSubmit={handleSave}>
@@ -346,7 +355,7 @@ function EventDetails() {
       </div>
 
       {event.finalDate && (
-        <div>
+        <div className="box">
           <h3>Final plan</h3>
           <p>
             {event.finalDate}
@@ -376,7 +385,7 @@ function EventDetails() {
       )}
 
       {isOrganizer && (
-        <div>
+        <div className="box">
           <h3>Participant list</h3>
           {responses.length === 0 && <p>No responses yet.</p>}
           {responses.map((item) => (

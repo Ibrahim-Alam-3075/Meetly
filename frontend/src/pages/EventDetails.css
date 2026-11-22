@@ -1,4 +1,23 @@
+.box {
+  margin-bottom: 10px;
+}
+
+.box h3 {
+  margin-top: 10px;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.option-column {
+  flex: 1 1 300px;
+}
+
 .choice {
+  min-height: 160px;
   margin-bottom: 10px;
 }
 

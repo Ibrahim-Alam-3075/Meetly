@@ -39,7 +39,7 @@ a:hover {
   color: #2f6690;
 }
 
-.choice, .final-box, .agenda-box, .event-card, .auth-card, .profile-form, .step {
+.choice, .final-box, .agenda-box, .event-card, .auth-card, .profile-form, .step, .box {
   background-color: white;
   border: 1px solid lightgray;
   border-radius: 8px;
