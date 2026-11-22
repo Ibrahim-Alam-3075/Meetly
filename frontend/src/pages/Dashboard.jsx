@@ -25,15 +25,19 @@ function Dashboard() {
 
       <h3>Upcoming</h3>
       {upcoming.length === 0 && <p>No upcoming events.</p>}
-      {upcoming.map((event) => (
-        <EventCard key={event._id} event={event} />
-      ))}
+      <div className="event-list">
+        {upcoming.map((event) => (
+          <EventCard key={event._id} event={event} />
+        ))}
+      </div>
 
       <h3>Past</h3>
       {past.length === 0 && <p>No past events.</p>}
-      {past.map((event) => (
-        <EventCard key={event._id} event={event} />
-      ))}
+      <div className="event-list">
+        {past.map((event) => (
+          <EventCard key={event._id} event={event} />
+        ))}
+      </div>
     </div>
   );
 }

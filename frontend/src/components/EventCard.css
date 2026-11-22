@@ -1,5 +1,6 @@
 .event-card {
-  margin-bottom: 12px;
+  flex: 1 1 300px;
+  max-width: 400px;
 }
 
 .event-card h3 {

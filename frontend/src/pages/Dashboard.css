@@ -2,3 +2,9 @@
   margin-top: 18px;
   margin-bottom: 10px;
 }
+
+.event-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
