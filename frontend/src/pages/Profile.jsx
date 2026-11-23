@@ -43,8 +43,8 @@ function Profile() {
       return;
     }
 
-    if (password && password.length < 4) {
-      setError("New password must be at least 4 characters.");
+    if (password && password.length < 8) {
+      setError("New password must be at least 8 characters.");
       return;
     }
 
