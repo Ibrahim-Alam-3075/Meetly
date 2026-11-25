@@ -103,8 +103,8 @@ const updateProfile = async (req, res) => {
     }
 
     if (req.body.password) {
-      if (req.body.password.length < 4) {
-        return res.status(400).json({ message: 'Password must be at least 4 characters' })
+      if (req.body.password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters' })
       }
       const salt = await bcrypt.genSalt(10)
       user.password = await bcrypt.hash(req.body.password, salt)
