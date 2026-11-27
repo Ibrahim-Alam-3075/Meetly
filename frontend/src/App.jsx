@@ -27,7 +27,8 @@ function App() {
           if (Array.isArray(data)) {
             dispatch(setEvents(data));
           }
-        });
+        })
+        .catch(() => dispatch(setEvents([])));
     } else if (!token) {
       dispatch(setEvents([]));
     }
@@ -41,7 +42,15 @@ function App() {
         .then(response => response.json())
         .then(data => {
           if (data._id) {
-            dispatch(login({ _id: data._id, name: data.name, email: data.email, bio: data.bio || '' }));
+            dispatch(
+              login({
+                _id: data._id,
+                name: data.name,
+                email: data.email,
+                bio: data.bio || '',
+                avatarColor: data.avatarColor || '#6366f1'
+              })
+            );
           } else {
             localStorage.removeItem('token');
           }

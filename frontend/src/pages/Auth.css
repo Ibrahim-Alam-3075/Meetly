@@ -1,33 +1,111 @@
+.auth-shell {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+
 .auth-card {
-  max-width: 400px;
-  margin: 30px auto;
-  padding: 20px;
+  width: 100%;
+  max-width: 440px;
+  padding: 32px 28px;
 }
 
-.auth-card h2 {
-  margin-bottom: 10px;
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
 }
 
-.auth-card div {
-  margin-bottom: 10px;
+.auth-logo {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 14px;
+  border-radius: 14px;
+  background: var(--accent-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--accent-glow);
 }
 
-.auth-card label {
-  color: steelblue;
-  display: block;
+.auth-header h2 {
+  font-size: 1.55rem;
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
-.auth-card input {
+.auth-header p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-group label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.input-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 13px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.input-icon-wrap input {
+  padding-left: 38px;
+  padding-right: 40px;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.eye-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  box-shadow: none;
+  transform: none;
+}
+
+.auth-submit {
+  margin-top: 6px;
+  padding: 12px;
   width: 100%;
 }
 
-.auth-button {
-  width: 100%;
-  margin-top: 5px;
+.auth-footer-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
 }
 
-.auth-card p {
-  line-height: 1.5;
-  margin-top: 10px;
+.auth-footer-text a {
+  font-weight: 700;
 }

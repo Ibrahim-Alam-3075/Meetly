@@ -23,6 +23,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: '',
       trim: true
+    },
+    avatarColor: {
+      type: String,
+      default: '#6366f1'
     }
   },
   {

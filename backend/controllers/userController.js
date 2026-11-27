@@ -34,7 +34,8 @@ const registerUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      bio: user.bio || ''
+      bio: user.bio || '',
+      avatarColor: user.avatarColor || '#6366f1'
     })
   } catch (error) {
     return res.status(500).json({ message: error.message })
@@ -66,6 +67,7 @@ const loginUser = async (req, res) => {
       name: user.name,
       email: user.email,
       bio: user.bio || '',
+      avatarColor: user.avatarColor || '#6366f1',
       _id: user._id
     })
   } catch (error) {
@@ -79,7 +81,8 @@ const getMe = async (req, res) => {
       _id: req.user._id,
       name: req.user.name,
       email: req.user.email,
-      bio: req.user.bio || ''
+      bio: req.user.bio || '',
+      avatarColor: req.user.avatarColor || '#6366f1'
     })
   } catch (error) {
     return res.status(500).json({ message: error.message })
@@ -102,6 +105,10 @@ const updateProfile = async (req, res) => {
       user.bio = req.body.bio.trim()
     }
 
+    if (req.body.avatarColor) {
+      user.avatarColor = req.body.avatarColor
+    }
+
     if (req.body.password) {
       if (req.body.password.length < 8) {
         return res.status(400).json({ message: 'Password must be at least 8 characters' })
@@ -116,7 +123,8 @@ const updateProfile = async (req, res) => {
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
-      bio: updatedUser.bio || ''
+      bio: updatedUser.bio || '',
+      avatarColor: updatedUser.avatarColor || '#6366f1'
     })
   } catch (error) {
     return res.status(500).json({ message: error.message })
